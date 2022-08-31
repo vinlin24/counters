@@ -78,6 +78,29 @@ def load_json() -> LoadedDict:
     return data
 
 
+def get_discord_task(data: LoadedDict) -> str | None:
+    """Prepare the "status" argument to pass to update_discord().
+
+    Args:
+        data (LoadedDict): The loaded and configured data from the
+        central JSON file.
+
+    Returns:
+        str | None: The instantiated status template to pass to
+        update_discord(), or None if opted out of updating status.
+    """
+    # Extract Discord part
+    task: dict = data["discord"]  # type: ignore
+
+    # Fill placeholder in status template if provided
+    start: date | None = task["start"]
+    status: str | None = task["status"]
+    if start is not None and status is not None:
+        status = status.format(day_number(start))
+
+    return status
+
+
 def get_instagram_task(data: LoadedDict) -> str | None:
     """Prepare the "bio" argument to pass to update_instagram().
 
