@@ -12,10 +12,13 @@ import dotenv
 dotenv.load_dotenv(override=True)
 
 
-# ==================== CENTRAL JSON FILE ==================== #
+# ==================== CENTRAL FILES ==================== #
 
 JSON_FILE_PATH = Path.home() / ".config" / "counters" / "bios.json"
 DATE_FORMAT = "%Y-%m-%d"
+
+LOG_FILE_PATH = Path.home() / ".config" / "counters" / "counters.log"
+"""Log file to print to."""
 
 
 # ==================== SELENIUM ==================== #
