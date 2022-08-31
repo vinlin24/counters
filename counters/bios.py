@@ -1,6 +1,7 @@
 """bios.py
 
-Load the central JSON file and fill the placeholders.
+Load the central JSON file, fill placeholders, and call the respective
+update handlers.
 """
 
 import json
@@ -75,6 +76,29 @@ def load_json() -> LoadedDict:
             )
 
     return data
+
+
+def get_instagram_task(data: LoadedDict) -> str | None:
+    """Prepare the "bio" argument to pass to update_instagram().
+
+    Args:
+        data (LoadedDict): The loaded and configured data from the
+        central JSON file.
+
+    Returns:
+        str | None: The instantiated bio template to pass to
+        update_instagram(), or None if opted out of updating bio.
+    """
+    # Extract Instagram part
+    task: dict = data["instagram"]  # type: ignore
+
+    # Fill placeholder in bio template if provided
+    start: date | None = task["start"]
+    bio: str | None = task["bio"]
+    if start is not None and bio is not None:
+        bio = bio.format(day_number(start))
+
+    return bio
 
 
 def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:

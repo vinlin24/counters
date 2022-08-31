@@ -4,8 +4,12 @@ Interface for updating Instagram bio.
 """
 
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 from .config import (EDGE_DRIVER_PATH, INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME,
                      WAIT_TIMEOUT)
@@ -45,12 +49,16 @@ def _navigate_to_profile(driver: webdriver.Edge) -> None:
     Args:
         driver (webdriver.Edge): Edge web driver instance.
     """
-    # Dismiss the "Save login info"
-    not_now_button = driver.find_element(
-        "xpath",
-        "/html/body/div[1]/section/main/div/div/div/div/button"
-    )
-    not_now_button.click()
+    # Dismiss the "Save login info" if it appears
+    try:
+        not_now_button = driver.find_element(
+            "xpath",
+            "/html/body/div[1]/section/main/div/div/div/div/button"
+        )
+        not_now_button.click()
+    # I have no idea why this happens
+    except WebDriverException:
+        pass
 
     # Just redirect lol, not dealing with more popup shit
     driver.get("https://www.instagram.com/accounts/edit/")
@@ -79,6 +87,14 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     bio_box.send_keys(bio)
     submit_button.click()
 
+    # Make sure the update registered
+    profile_saved_xpath = "/html/body/div[3]/div[1]/div/div/div/p"
+    WebDriverWait(driver, WAIT_TIMEOUT).until(
+        EC.presence_of_element_located((By.XPATH, profile_saved_xpath))
+    )
+    # Raises TimeoutException when element not located by timeout:
+    # from selenium.common.exceptions import TimeoutException
+
 
 def update_bio(bio: str | None = None) -> None:
     """Update Instagram profile bio with new bio.
@@ -94,7 +110,7 @@ def update_bio(bio: str | None = None) -> None:
     # Initialize driver
     service = Service(str(EDGE_DRIVER_PATH))
     options = Options()
-    options.headless = False
+    options.headless = True
     driver = webdriver.Edge(service=service, options=options)
 
     # Wait for page to load
