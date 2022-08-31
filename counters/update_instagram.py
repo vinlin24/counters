@@ -6,13 +6,10 @@ Interface for updating Instagram bio.
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.edge.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from .config import (EDGE_DRIVER_PATH, INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME,
-                     WAIT_TIMEOUT)
+from .config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, WAIT_TIMEOUT
 
 
 def _login(driver: webdriver.Edge) -> None:
@@ -96,10 +93,11 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     # from selenium.common.exceptions import TimeoutException
 
 
-def update_bio(bio: str | None = None) -> None:
+def update_bio(driver: webdriver.Edge, bio: str | None = None) -> None:
     """Update Instagram profile bio with new bio.
 
     Args:
+        driver (webdriver.Edge): Edge web driver instance.
         bio (str | None, optional): New bio. Defaults to None, meaning
         leave the bio unchanged, in which case, this function does
         nothing.
@@ -107,20 +105,8 @@ def update_bio(bio: str | None = None) -> None:
     if bio is None:
         return
 
-    # Initialize driver
-    service = Service(str(EDGE_DRIVER_PATH))
-    options = Options()
-    options.headless = True
-    driver = webdriver.Edge(service=service, options=options)
-
-    # Wait for page to load
-    driver.get("https://www.instagram.com/direct/inbox/")
-    driver.implicitly_wait(WAIT_TIMEOUT)
-
     # Webscraping sequences
+    driver.get("https://www.instagram.com/direct/inbox/")
     _login(driver)
     _navigate_to_profile(driver)
     _update_profile(driver, bio)
-
-    # Cleanup
-    driver.quit()
