@@ -18,6 +18,16 @@ JSON_FILE_PATH = Path.home() / ".config" / "counters" / "bios.json"
 DATE_FORMAT = "%Y-%m-%d"
 
 
+# ==================== SELENIUM ==================== #
+
+EDGE_DRIVER_PATH = Path("C:/Users/soula/AppData/Local/Programs/Python/"
+                        "Python310/Scripts/MicrosoftWebDriver.exe")
+"""Absolute path to my Edge web driver executable."""
+
+WAIT_TIMEOUT = 5.0
+"""Time in seconds to implicitly wait for a webpage to load."""
+
+
 # ==================== CREDENTIALS ==================== #
 
 DISCORD_EMAIL = os.environ["DISCORD_EMAIL"]
