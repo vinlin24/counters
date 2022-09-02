@@ -20,8 +20,8 @@ from .update_spotify import update_playlist
 
 logging.basicConfig(
     filename=LOG_FILE_PATH,
-    format="[%(asctime)s] [%(levelname)-8s] %(filename)s:%(lineno)s:%(message)s",
-    datefmt="[%X]",
+    format="[%(asctime)s] [%(levelname)-8s] %(filename)s:%(lineno)s: %(message)s",
+    datefmt="%Y-%m-%d %X",
     level=logging.INFO
 )
 log = logging.getLogger("counters")

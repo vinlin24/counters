@@ -75,8 +75,8 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     )
     submit_button = driver.find_element(
         "xpath",
-        ("/html/body/div[1]/div/div[1]/div/div[1]/div/div/div/div[1]/div[1]/"
-         "section/main/div/article/form/div[10]/div/div/button")
+        ("/html/body/div[1]/div/div/div/div[1]/div/div/div/div[1]/section/"
+         "main/div/article/form/div[10]/div/div/button")
     )
 
     # Submit new bio string
