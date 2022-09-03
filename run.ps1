@@ -39,6 +39,12 @@ function Start-CommitTask {
     Write-Host "Updated requirements.txt with state of current venv."
 }
 
+<# View log file #>
+function Start-ViewLogTask {
+    Write-Host "TASK: Opening program log file in editor..." -ForegroundColor Yellow
+    code "C:\Users\soula\.config\counters\counters.log"
+}
+
 <# Main process: determine which task to run #>
 
 switch ($TaskName) {
@@ -46,6 +52,7 @@ switch ($TaskName) {
     "Run" { Start-RunTask }
     "Test" { Start-TestTask }
     "Commit" { Start-CommitTask }
+    "Log" { Start-ViewLogTask }
     default {
         Write-Host "Unrecognized task name, aborted." -ForegroundColor Red
         exit 1

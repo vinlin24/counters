@@ -14,3 +14,6 @@ __pycache__/
 # Workspace
 .vscode*/
 *.code-workspace
+
+# Local only
+msedgedriver.exe

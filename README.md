@@ -103,10 +103,14 @@ You can use the helper script [run.ps1](run.ps1) to run some shortcut commands, 
 ./run  # Run the program, updating all statuses
 ```
 
+The package looks for the Edge web driver executable within the package itself by the name of `msedgedriver.exe`. Download the version compatible with the current version of your Edge web browser from [the official website](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/) and place it in the root of the package (same level as [`__init__.py`](counters/__init__.py)).
+
 ## Implementation Details
 
 The Spotify part uses the [tekore](https://tekore.readthedocs.io/en/stable/index.html) library as a wrapper for the [Spotify Web API](https://developer.spotify.com/documentation/web-api/). This is a robust and actively maintained library, so I do not worry much about having to modify this part of the code.
 
 The Discord and Instagram parts use [Selenium](https://selenium-python.readthedocs.io/) webscraping to navigate the respective web applications and update my user status/bio since they lack APIs that support such an action. The problem with this is that their implementations risk breaking every update because they rely on the XPath values of web elements that can change unexpectedly. For example, the XPaths found in my original [discord_profile.py](counters/update_discord.py) are no longer applicable.
 
-Lastly, don't forget to update the [JSON schema](#configuration) part of this documentation if you choose to add new features that affect it.
+When the program breaks because of incompatibility of driver and browser versions, update the executable as described [above](#environment-recovery). The code has been changed such that a new path does not have to be written into the source code upon each update; instead, it trusts the invariant that `mesedgedriver.exe` is found in the package.
+
+Don't forget to update the [JSON schema](#configuration) part of this documentation if you choose to add new features that affect it.
