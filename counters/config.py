@@ -49,4 +49,7 @@ SPOTIFY_REDIRECT_URI = os.environ["SPOTIFY_REDIRECT_URI"]
 SPOTIFY_USER_REFRESH = os.environ["SPOTIFY_USER_REFRESH"]
 
 ERROR_EMAIL = os.environ["ERROR_EMAIL"]
-"""Email to send and receive error reports on localhost."""
+"""My email to send and receive error reports."""
+
+ERROR_EMAIL_PASSWORD = os.environ["ERROR_EMAIL_PASSWORD"]
+"""Password to ERROR_EMAIL."""

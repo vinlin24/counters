@@ -26,7 +26,9 @@ def run_program(fails: TaskFailure) -> None:
     # Load data from central JSON file
     try:
         data = load_json()
+        print("JSON data loaded.")
     except Exception as e:
+        print("FAILED to load JSON data.")
         fails.json = e
         return
 
@@ -40,7 +42,9 @@ def run_program(fails: TaskFailure) -> None:
         options.add_argument("--window-size=1920,1080")
         driver = webdriver.Edge(service=service, options=options)
         driver.implicitly_wait(WAIT_TIMEOUT)
+        print("Driver initialized.")
     except Exception as e:
+        print("FAILED to initialize driver.")
         fails.driver = e
         return
 
@@ -49,13 +53,17 @@ def run_program(fails: TaskFailure) -> None:
     try:
         discord_status = get_discord_task(data)
         update_status(driver, discord_status)
+        print("Updated Discord custom status.")
     except Exception as e:
+        print("FAILED to update Discord custom status.")
         fails.discord = e
 
     try:
         instagram_bio = get_instagram_task(data)
         update_bio(driver, instagram_bio)
+        print("Updated Instagram bio.")
     except Exception as e:
+        print("FAILED to update Instagram bio.")
         fails.instagram = e
 
     try:
@@ -64,10 +72,13 @@ def run_program(fails: TaskFailure) -> None:
         fails.spotify[None] = e
     else:
         for task in spotify_tasks:
+            playlist_id = task["playlist_id"]
             try:
                 update_playlist(**task)  # type: ignore
+                print(f"Updated Spotify playlist with ID={playlist_id}.")
             except Exception as e:
-                playlist_id = task["playlist_id"]
+                print(
+                    f"FAILED to update Spotify playlist with ID={playlist_id}.")
                 fails.spotify[playlist_id] = e
 
     # Cleanup

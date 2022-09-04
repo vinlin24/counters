@@ -10,6 +10,5 @@ from .emailer import TaskFailure, send_email
 fails = TaskFailure()
 run_program(fails)
 
-# Send failure report is there was any error:
-if not fails.all_good():
-    send_email(fails)
+# Send failure report is there was any error
+send_email(fails)
