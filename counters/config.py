@@ -17,9 +17,6 @@ dotenv.load_dotenv(override=True)
 JSON_FILE_PATH = Path.home() / ".config" / "counters" / "bios.json"
 DATE_FORMAT = "%Y-%m-%d"
 
-LOG_FILE_PATH = Path.home() / ".config" / "counters" / "counters.log"
-"""Log file to print to."""
-
 
 # ==================== SELENIUM ==================== #
 
@@ -50,3 +47,6 @@ SPOTIFY_CLIENT_ID = os.environ["SPOTIFY_CLIENT_ID"]
 SPOTIFY_CLIENT_SECRET = os.environ["SPOTIFY_CLIENT_SECRET"]
 SPOTIFY_REDIRECT_URI = os.environ["SPOTIFY_REDIRECT_URI"]
 SPOTIFY_USER_REFRESH = os.environ["SPOTIFY_USER_REFRESH"]
+
+ERROR_EMAIL = os.environ["ERROR_EMAIL"]
+"""Email to send and receive error reports on localhost."""
