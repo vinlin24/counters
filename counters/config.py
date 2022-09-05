@@ -15,7 +15,13 @@ dotenv.load_dotenv(override=True)
 # ==================== CENTRAL FILES ==================== #
 
 JSON_FILE_PATH = Path.home() / ".config" / "counters" / "bios.json"
+"""Absolute path to the central JSON file containing status templates."""
+
 DATE_FORMAT = "%Y-%m-%d"
+"""String format to encode dates in the centrala JSON file."""
+
+LOG_FILE_PATH = JSON_FILE_PATH.parent / "counters.log"
+"""Absolute path to the program log file."""
 
 
 # ==================== SELENIUM ==================== #

@@ -14,9 +14,7 @@ I placed a configuration file at:
 ```
 ~\.config\counters\bios.json
 ```
-If it's missing, you should make one at this path. 
-
-Changed: A log file is no longer maintained here. Instead, an email is sent upon failure. Maybe in the future I'll reimplement a logging system in addition to the emailing for easier tracing.
+If it's missing, you should make one at this path. A log file is also maintained in this directory.
 
 As of now, the `bios.json` file should have the following schema:
 
@@ -116,6 +114,6 @@ The Discord and Instagram parts use [Selenium](https://selenium-python.readthedo
 
 When the program breaks because of incompatibility of driver and browser versions, update the executable as described [above](#environment-recovery). The code has been changed such that a new path does not have to be written into the source code upon each update; instead, it trusts the invariant that `mesedgedriver.exe` is found in the package.
 
-Updated: Replaced logging with an error emailing feature. If an error in any part of the main process is raised, it is compiled in an email sent to myself.
+Updated: If an error in any part of the main process is raised, it is compiled in an email sent to myself in addition to logging it to the log file.
 
 Don't forget to update the [JSON schema](#configuration) part of this documentation if you choose to add new features that affect it.

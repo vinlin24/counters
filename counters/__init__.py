@@ -10,7 +10,7 @@ from selenium.webdriver.edge.service import Service
 from .bios import (get_discord_task, get_instagram_task, get_spotify_tasks,
                    load_json)
 from .config import EDGE_DRIVER_PATH, WAIT_TIMEOUT
-from .emailer import TaskFailure
+from .logger import TaskFailure
 from .update_discord import update_status
 from .update_instagram import update_bio
 from .update_spotify import update_playlist
