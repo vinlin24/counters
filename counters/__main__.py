@@ -24,7 +24,7 @@ s = ns.spotify
 # If no flags were supplied, run all as default behavior
 # This way it doesn't break the task set up in Task Scheduler
 if not any((d, i, s)):
-    d = i = s = False
+    d = i = s = True
 
 # Run program
 fails = TaskFailure()
