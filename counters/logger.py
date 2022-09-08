@@ -49,11 +49,17 @@ def _format_error(error: Exception) -> str:
     return "".join(traceback.format_exception(error)) + "\n"
 
 
-def format_content(fails: TaskFailure) -> str | None:
+def format_content(fails: TaskFailure,
+                   discord: bool,
+                   instagram: bool,
+                   spotify: bool) -> str | None:
     """Generate the status report from stored exceptions.
 
     Args:
         fails (TaskFailure): Exception recorder instance.
+        discord (bool): Whether the Discord task was run.
+        instagram (bool): Whether the Instagram task was run.
+        spotify (bool): Whether the Spotify tasks were run.
 
     Returns:
         str | None: Text to log or send. Return None if there are no
@@ -76,38 +82,44 @@ def format_content(fails: TaskFailure) -> str | None:
         content += _format_error(fails.driver)
         return content  # No other errors could be reached if this failed
 
+    # Summary lines
+    summaries = []
+
     # Independent task failures
     content = ""
-    if fails.discord:
-        content += "Couldn't update Discord custom status:\n"
-        content += _format_error(fails.discord)
-    if fails.instagram:
-        content += "Couldn't update Instagram custom status:\n"
-        content += _format_error(fails.instagram)
-
-    if fails.spotify:
-        if None in fails.spotify:
-            content += "There was an error getting the Spotify tasks:\n"
-            content += _format_error(fails.spotify[None])
+    if discord:
+        if fails.discord:
+            content += "Couldn't update Discord custom status:\n"
+            content += _format_error(fails.discord)
+            summaries.append("Discord: FAILED")
         else:
-            for playlist_id, error in fails.spotify.items():
-                content += ("Couldn't update details of Spotify playlist with "
-                            f"ID {playlist_id}:\n")
-                content += _format_error(error)
+            summaries.append("Discord: SUCCESS")
 
-    # Summary
-    d = "Discord: " + ("FAILED" if fails.discord else "SUCCESS")
-    i = "Instagram: " + ("FAILED" if fails.instagram else "SUCCESS")
-    summaries = [d, i]
-    if fails.spotify:
-        # Ignore None case for playlist summary
-        fails.spotify.pop(None, None)
-        for playlist_id in fails.spotify.keys():
-            s = f"Spotify (ID={playlist_id}): " + \
-                ("FAILED" if fails.spotify else "SUCCESS")
-            summaries.append(s)
-    else:
-        summaries.append("Spotify: SUCCESS")
+    if instagram:
+        if fails.instagram:
+            content += "Couldn't update Instagram custom status:\n"
+            content += _format_error(fails.instagram)
+            summaries.append("Instagram: FAILED")
+        else:
+            summaries.append("Instagram: SUCCESS")
+
+    if spotify:
+        if fails.spotify:
+            # Overall failure
+            if None in fails.spotify:
+                content += "There was an error getting the Spotify tasks:\n"
+                content += _format_error(fails.spotify[None])
+                summaries.append("Spotify: FAILED")
+            # Playlist-specific failure
+            else:
+                for playlist_id, error in fails.spotify.items():
+                    content += ("Couldn't update details of Spotify playlist with "
+                                f"ID {playlist_id}:\n")
+                    content += _format_error(error)
+                    summaries.append(f"Spotify (ID={playlist_id}): FAILED")
+        else:
+            summaries.append("Spotify: SUCCESS")
+
     content += "\n".join(summaries) + "\n"
 
     # Disclaimer
@@ -124,12 +136,11 @@ def log_report(report: str | None) -> None:
     Args:
         report (str | None): Error report. None if no errors occurred.
     """
+    entry = f"[{datetime.now()}] "
     if report is None:
-        entry = "No problems detected."
+        entry += "No problems detected.\n"
     else:
-        entry = f"The program encountered errors:\n{report}"
-
-    entry = f"[{datetime.now()}] {entry}\n"
+        entry += f"Encountered errors:\n{report}\n"
 
     with open(LOG_FILE_PATH, "at") as fp:
         fp.write(entry)

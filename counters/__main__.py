@@ -30,7 +30,7 @@ if not any((d, i, s)):
 fails = TaskFailure()
 run_program(fails, d, i, s)
 
-report = format_content(fails)
+report = format_content(fails, d, i, s)
 
 # Log and send failure report is there was any error
 log_report(report)

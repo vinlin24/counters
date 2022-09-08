@@ -141,16 +141,20 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
 
     result = []
     for task in tasks:
-        # Fill day number placeholder if included
+        # Fill day number placeholders if included
+        name: str | None = task["name"]
         description: str | None = task["description"]
         start: date | None = task["start"]
-        if description is not None and start is not None:
-            description = description.format(day_number(start))
+        if start is not None:
+            if name is not None:
+                name = name.format(day_number(start))
+            if description is not None:
+                description = description.format(day_number(start))
 
         # Prepare the kwargs for this task
         kwargs = {
             "playlist_id": task["playlist_id"],
-            "name": task["name"],
+            "name": name,
             "description": description
         }
         result.append(kwargs)
