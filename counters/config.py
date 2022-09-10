@@ -37,7 +37,7 @@ the Edge web browser is updated such that the driver and the browser
 applicatin are compatible with each other.
 """
 
-WAIT_TIMEOUT = 5.0
+WAIT_TIMEOUT = 15.0
 """Time in seconds to implicitly wait for a webpage to load."""
 
 
