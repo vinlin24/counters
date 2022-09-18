@@ -12,7 +12,7 @@ PASSWORD_INPUT = "#uid_8"
 AVATAR_ICON = ".avatar-1EWyVD.wrapper-1VLyxH"
 """The circular, clickable avatar icon in the bottom left."""
 
-EDIT_STATUS_ITEM = "#account-edit-custom-status"
+EDIT_STATUS_ITEM = "#account-set-custom-status"
 """The "Edit Custom Status" menu item in the avatar menu popup."""
 
 STATUS_INPUT = ".inputDefault-3FGxgL.input-2g-os5.input-3AAlUz"
