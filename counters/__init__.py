@@ -17,6 +17,7 @@ from .update_spotify import update_playlist
 
 
 def run_program(fails: TaskFailure,
+                windowed: bool,
                 discord: bool,
                 instagram: bool,
                 spotify: bool
@@ -26,6 +27,8 @@ def run_program(fails: TaskFailure,
     Args:
         fails (TaskFailure): Dataclass whose fields record errors, if
         any, for individual tasks within this function.
+        windowed (bool): Whether to run the driver with a browser
+        window instead of headlessly.
         discord (bool): Whether to run the Discord task.
         instagram (bool): Whether to run the Instagram task.
         spotify (bool): Whether to run the Spotify tasks.
@@ -43,7 +46,7 @@ def run_program(fails: TaskFailure,
     try:
         service = Service(str(EDGE_DRIVER_PATH))
         options = Options()
-        options.headless = True
+        options.headless = not windowed
         # Headless option by default causes window to be tiny, which interferes
         # with finding elements if it's rendered responsively
         options.add_argument("--window-size=1920,1080")
