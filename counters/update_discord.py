@@ -16,15 +16,16 @@ XPATH_EMAIL_INPUT = ("/html/body/div[1]/div[2]/div/div[1]/div/div/div/div/"
                      "form/div/div/div[1]/div[2]/div[1]/div/div[2]/input")
 XPATH_PASSWORD_INPUT = ("/html/body/div[1]/div[2]/div/div[1]/div/div/div/div/"
                         "form/div/div/div[1]/div[2]/div[2]/div/input")
-XPATH_AVATAR_ICON = ("/html/body/div[1]/div[2]/div/div[1]/div/div[2]/div/"
+XPATH_AVATAR_ICON = ("/html/body/div[2]/div[2]/div/div[1]/div/div[2]/div/"
                      "div[1]/div/div/div[1]/section/div[2]/div[1]/div[1]")
-XPATH_CUSTOM_STATUS = ("/html/body/div[1]/div[2]/div/div[3]/div/div/div/div/"
-                       "div[3]/div[2]")
-XPATH_STATUS_INPUT = ("/html/body/div[1]/div[2]/div/div[3]/div[2]/div/div/"
+XPATH_CUSTOM_STATUS = ("/html/body/div[2]/div[2]/div/div[3]/div/div/div/div/"
+                       "div[3]/div[2]/div[1]")
+XPATH_STATUS_INPUT = ("/html/body/div[2]/div[2]/div/div[3]/div[2]/div/div/"
                       "div[2]/div[1]/div[2]/div/div[2]/input")
 
 
 # ==================== SCRAPING SUBROUTINES ==================== #
+
 
 def _login(driver: webdriver.Edge) -> None:
     """Handle authentication landing page.
