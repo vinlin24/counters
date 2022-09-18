@@ -39,6 +39,20 @@ class TaskFailure:
         """Return whether no failures were set."""
         return all(not val for val in self.__dict__.values())
 
+    def print_tracebacks(self) -> None:
+        """Print the stored tracebacks for --console debugging."""
+        if self.json:
+            print(_format_error(self.json))
+        if self.driver:
+            print(_format_error(self.driver))
+        if self.discord:
+            print(_format_error(self.discord))
+        if self.instagram:
+            print(_format_error(self.instagram))
+        if self.spotify:
+            for error in self.spotify.values():
+                print(_format_error(error))
+
 
 def _format_error(error: Exception) -> str:
     """Return the traceback of the error as a string.

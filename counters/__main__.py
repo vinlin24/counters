@@ -24,3 +24,5 @@ if not console_only:
     report = format_content(fails, d, i, s)
     log_report(report)
     send_email(report)
+else:
+    fails.print_tracebacks()
