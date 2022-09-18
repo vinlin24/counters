@@ -3,6 +3,9 @@
 Expose the main process to run as a function.
 """
 
+import sys
+from argparse import ArgumentParser, Namespace
+
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
@@ -14,6 +17,50 @@ from .logger import TaskFailure
 from .update_discord import update_status
 from .update_instagram import update_bio
 from .update_spotify import update_playlist
+
+
+def parse_args() -> Namespace:
+    """Parse and process command line options for debugging.
+
+    Returns:
+        Namespace: Object with 5 fields:
+
+        - console (bool): Output to console only, don't touch log file
+        and don't email.
+        - window (bool): Have Selenium run with a browser window
+        instead of headlessly
+        - discord (bool): See below.
+        - instagram (bool): See below.
+        - spotify (bool): If any of these 3 switches are included, run
+        these select tasks. Otherwise if all 3 switches are absent from
+        the command line, use the default behavior of running all.
+
+    Postcondition:
+        The values of these switches are not necessarily the same as
+        the values in the original Namespace returned by parse_args().
+        This function is responsible for some postprocessing, namely
+        setting discord = instagram = spotify = True when all three are
+        absent from the command line.
+    """
+    parser = ArgumentParser(description="Manually run counters program")
+
+    # Output to console only, don't touch log file and don't email
+    parser.add_argument("-c", "--console", action="store_true")
+    # Run with a browser window instead of headlessly
+    parser.add_argument("-w", "--window", action="store_true")
+    # If any of these are included, run those select tasks instead of all
+    parser.add_argument("-d", "--discord", action="store_true")
+    parser.add_argument("-i", "--instagram", action="store_true")
+    parser.add_argument("-s", "--spotify", action="store_true")
+    ns = parser.parse_args(sys.argv[1:])
+
+    # Argument postprocessing:
+    # If no flags were supplied, run all as default behavior
+    # This way it doesn't break the task set up in Task Scheduler
+    if not any((ns.discord, ns.instagram, ns.spotify)):
+        ns.discord = ns.instagram = ns.spotify = True
+
+    return ns
 
 
 def run_program(fails: TaskFailure,
