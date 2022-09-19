@@ -4,13 +4,14 @@ Interface for updating Discord custom status.
 """
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from .config import DISCORD_EMAIL, DISCORD_PASSWORD
 # Experimenting CSS selectors as an alternative to full XPaths
 # Not sure how often these will change in comparison
 from .selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
-                                PASSWORD_INPUT, STATUS_INPUT)
+                                PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
 
 # ==================== SCRAPING SUBROUTINES ==================== #
 
@@ -44,7 +45,11 @@ def _update_status(driver: webdriver.Edge, status: str) -> None:
     avatar_icon.click()
 
     # Click the "Edit custom status" option
-    custom_status = driver.find_element(By.CSS_SELECTOR, EDIT_STATUS_ITEM)
+    # If there's currently no status, it's "Set custom status" instead
+    try:
+        custom_status = driver.find_element(By.CSS_SELECTOR, EDIT_STATUS_ITEM)
+    except NoSuchElementException:
+        custom_status = driver.find_element(By.CSS_SELECTOR, SET_STATUS_ITEM)
     custom_status.click()
 
     # Get the input text bot
