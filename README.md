@@ -57,11 +57,29 @@ As of now, the `bios.json` file should have the following schema:
 - For each Spotify playlist entry, you have the option to change either the playlist name, description, or both. Leaving a key as `null` signifies leaving it unchanged.
 - The `comment` keys are not used. They're just a way to document each playlist entry for yourself.
 
+## Usage
+
+Since this program is meant to automate, it should be hooked up to a [scheduler](#setup) to be run periodically. That way, the statuses on all platforms update automatically, and all you need to do when you want to change the templates is edit the [bios.json file](#configuration).
+
+But for debugging/development purposes, the code can be run on demand with some command line options:
+
+```powershell
+cd path\to\this\repo
+.venv\Scripts\Activate.ps1
+python -m counters <# options #>
+```
+
+| Option           | Description                                                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-c/--console`   | Only output to the console. Do not write to the log file and do not send an email upon failure.                                                                         |
+| `-w/--window`    | Run the Selenium web scraper in an open browser window instead of headlessly.                                                                                           |
+| `-d/--discord`   | See below.                                                                                                                                                              |
+| `-i/--instagram` | See below.                                                                                                                                                              |
+| `-s/--spotify`   | If any of these 3 switches are included, run these select tasks. Otherwise if all 3 switches are absent from the command line, use the default behavior of running all. |
+
 ## Setup
 
-Since this program is meant to automate, it should be hooked up to something like Windows Task Scheduler to be run at every midnight, on startup, etc. That way, the statuses on all platforms update automatically, and all you need to do when you want to change the templates is edit the [bios.json file](#configuration).
-
-Below is my current setup for the Windows Task Scheduler:
+I use Windows Task Scheduler, and below is my current setup:
 
 ### General
 
