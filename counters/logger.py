@@ -43,23 +43,22 @@ class TaskFailure:
     itself and not in running the task for the playlist.
     """
 
+    github: Exception | None = None
+    """Error in the GitHub task."""
+
     def all_good(self) -> bool:
         """Return whether no failures were set."""
         return all(not val for val in self.__dict__.values())
 
     def print_tracebacks(self) -> None:
         """Print the stored tracebacks for --console debugging."""
-        if self.json:
-            print(_format_error(self.json))
-        if self.driver:
-            print(_format_error(self.driver))
-        if self.discord:
-            print(_format_error(self.discord))
-        if self.instagram:
-            print(_format_error(self.instagram))
-        if self.spotify:
-            for error in self.spotify.values():
-                print(_format_error(error))
+        for val in self.__dict__.values():
+            # self.spotify is a dict
+            if val is self.spotify:
+                for error in self.spotify.values():
+                    print(_format_error(error))
+            elif val:
+                print(_format_error(val))
 
 
 def _format_error(error: Exception) -> str:
@@ -74,7 +73,9 @@ def _format_error(error: Exception) -> str:
 def format_content(fails: TaskFailure,
                    discord: bool,
                    instagram: bool,
-                   spotify: bool) -> str | None:
+                   spotify: bool,
+                   github: bool,
+                   ) -> str | None:
     """Generate the status report from stored exceptions.
 
     Args:
@@ -82,6 +83,7 @@ def format_content(fails: TaskFailure,
         discord (bool): Whether the Discord task was run.
         instagram (bool): Whether the Instagram task was run.
         spotify (bool): Whether the Spotify tasks were run.
+        github (bool): Whether the GitHub tasks were run.
 
     Returns:
         str | None: Text to log or send. Return None if there are no
@@ -141,6 +143,14 @@ def format_content(fails: TaskFailure,
                     summaries.append(f"Spotify (ID={playlist_id}): FAILED")
         else:
             summaries.append("Spotify: SUCCESS")
+
+    if github:
+        if fails.github:
+            content += "Couldn't update GitHub profile bio:\n"
+            content += _format_error(fails.github)
+            summaries.append("GitHub: FAILED")
+        else:
+            summaries.append("GitHub: SUCCESS")
 
     content += "\n".join(summaries) + "\n"
 

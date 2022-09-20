@@ -31,16 +31,17 @@ def parse_args() -> Namespace:
         instead of headlessly
         - discord (bool): See below.
         - instagram (bool): See below.
-        - spotify (bool): If any of these 3 switches are included, run
-        these select tasks. Otherwise if all 3 switches are absent from
+        - spotify (bool): See below.
+        - github (bool): If any of these 4 switches are included, run
+        these select tasks. Otherwise if all 4 switches are absent from
         the command line, use the default behavior of running all.
 
     Postcondition:
         The values of these switches are not necessarily the same as
         the values in the original Namespace returned by parse_args().
         This function is responsible for some postprocessing, namely
-        setting discord = instagram = spotify = True when all three are
-        absent from the command line.
+        setting discord = instagram = spotify = github = True when all
+        4 are absent from the command line.
     """
     parser = ArgumentParser(description="Manually run counters program")
 
@@ -52,13 +53,14 @@ def parse_args() -> Namespace:
     parser.add_argument("-d", "--discord", action="store_true")
     parser.add_argument("-i", "--instagram", action="store_true")
     parser.add_argument("-s", "--spotify", action="store_true")
+    parser.add_argument("-g", "--github", action="store_true")
     ns = parser.parse_args(sys.argv[1:])
 
     # Argument postprocessing:
-    # If no flags were supplied, run all as default behavior
+    # If none of these swithces were supplied, run all as default behavior
     # This way it doesn't break the task set up in Task Scheduler
-    if not any((ns.discord, ns.instagram, ns.spotify)):
-        ns.discord = ns.instagram = ns.spotify = True
+    if not any((ns.discord, ns.instagram, ns.spotify, ns.github)):
+        ns.discord = ns.instagram = ns.spotify = ns.github = True
 
     return ns
 
@@ -67,7 +69,8 @@ def run_program(fails: TaskFailure,
                 windowed: bool,
                 discord: bool,
                 instagram: bool,
-                spotify: bool
+                spotify: bool,
+                github: bool,
                 ) -> None:
     """Run the main process.
 
@@ -79,6 +82,7 @@ def run_program(fails: TaskFailure,
         discord (bool): Whether to run the Discord task.
         instagram (bool): Whether to run the Instagram task.
         spotify (bool): Whether to run the Spotify tasks.
+        github (bool); Whether to run the GitHub task.
     """
     # Load data from central JSON file
     try:
@@ -141,6 +145,13 @@ def run_program(fails: TaskFailure,
                     print(
                         f"FAILED to update Spotify playlist with ID={playlist_id}.")
                     fails.spotify[playlist_id] = e
+
+    if github:
+        try:
+            print("TODO.")  # TODO
+        except Exception as e:
+            print("FAILED to update GitHub bio.")
+            fails.github = e
 
     # Cleanup
     driver.quit()

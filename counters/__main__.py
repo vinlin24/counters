@@ -14,17 +14,18 @@ windowed: bool = ns.window
 d: bool = ns.discord
 i: bool = ns.instagram
 s: bool = ns.spotify
+g: bool = ns.github
 
 if console_only:
     logging.disable(100)
 
 # Run program
 fails = TaskFailure()
-run_program(fails, windowed, d, i, s)
+run_program(fails, windowed, d, i, s, g)
 
 # Log and send failure report is there was any error
 if not console_only:
-    report = format_content(fails, d, i, s)
+    report = format_content(fails, d, i, s, g)
     log_report(report)
     send_email(report)
 else:
