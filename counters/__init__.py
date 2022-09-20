@@ -15,6 +15,7 @@ from .bios import (get_discord_task, get_instagram_task, get_spotify_tasks,
 from .config import EDGE_DRIVER_PATH, WAIT_TIMEOUT
 from .logger import TaskFailure
 from .update_discord import update_status
+from .update_github import update_profile_bio
 from .update_instagram import update_bio
 from .update_spotify import update_playlist
 
@@ -148,7 +149,9 @@ def run_program(fails: TaskFailure,
 
     if github:
         try:
-            print("TODO.")  # TODO
+            github_bio = "hello there"  # TODO: get_github_task(data)
+            update_profile_bio(driver, github_bio)
+            print("Updated GitHub bio.")
         except Exception as e:
             print("FAILED to update GitHub bio.")
             fails.github = e
