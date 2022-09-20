@@ -1,4 +1,4 @@
-"""update_instagram.py
+"""instagram.py
 
 Interface for updating Instagram bio.
 """
@@ -9,11 +9,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from .config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, WAIT_TIMEOUT
-from .logger import log
-from .selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
-                                  SUBMIT_BUTTON, USERNAME_INPUT,
-                                  XPATH_NOT_NOW_BUTTON, XPATH_PROFILE_SAVED)
+from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, WAIT_TIMEOUT
+from ..logger import log
+from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
+                                   SUBMIT_BUTTON, USERNAME_INPUT,
+                                   XPATH_NOT_NOW_BUTTON, XPATH_PROFILE_SAVED)
 
 
 def _login(driver: webdriver.Edge) -> None:

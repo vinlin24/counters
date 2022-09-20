@@ -1,4 +1,4 @@
-"""update_discord.py
+"""discord.py
 
 Interface for updating Discord custom status.
 """
@@ -7,11 +7,11 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from .config import DISCORD_EMAIL, DISCORD_PASSWORD
+from ..config import DISCORD_EMAIL, DISCORD_PASSWORD
 # Experimenting CSS selectors as an alternative to full XPaths
 # Not sure how often these will change in comparison
-from .selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
-                                PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
+from ..selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
+                                 PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
 
 # ==================== SCRAPING SUBROUTINES ==================== #
 

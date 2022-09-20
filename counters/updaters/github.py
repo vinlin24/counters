@@ -1,4 +1,4 @@
-"""update_github.py
+"""github.py
 
 Interface for updating the GitHub profile bio.
 """
@@ -8,9 +8,9 @@ from urllib.parse import urlencode
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from .config import GITHUB_EMAIL, GITHUB_PASSWORD, GITHUB_PROFILE_URL
-from .selectors.github import (BIO_TEXTAREA, EDIT_PROFILE_BUTTON, EMAIL_INPUT,
-                               PASSWORD_INPUT, SAVE_BUTTON)
+from ..config import GITHUB_EMAIL, GITHUB_PASSWORD, GITHUB_PROFILE_URL
+from ..selectors.github import (BIO_TEXTAREA, EDIT_PROFILE_BUTTON, EMAIL_INPUT,
+                                PASSWORD_INPUT, SAVE_BUTTON)
 
 # ==================== SCRAPING SUBROUTINES ==================== #
 

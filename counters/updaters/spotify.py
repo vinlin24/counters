@@ -1,12 +1,12 @@
-"""update_spotify.py
+"""spotify.py
 
 Interface for updating Spotify playlist details.
 """
 
 import tekore
 
-from .config import (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET,
-                     SPOTIFY_USER_REFRESH)
+from ..config import (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET,
+                      SPOTIFY_USER_REFRESH)
 
 # Authenticate
 token = tekore.refresh_user_token(client_id=SPOTIFY_CLIENT_ID,
