@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from .config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, WAIT_TIMEOUT
+from .logger import log
 from .selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
                                   SUBMIT_BUTTON, USERNAME_INPUT,
                                   XPATH_NOT_NOW_BUTTON, XPATH_PROFILE_SAVED)
@@ -80,6 +81,7 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
         )
     except TimeoutException:
         print("Couldn't locate 'Profile saved' flash notification.")
+        log.error("Couldn't locate 'Profile saved' flash notification.")
         raise
 
 

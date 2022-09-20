@@ -5,7 +5,7 @@ Entry point.
 
 from . import parse_args, run_program
 from .emailer import send_email
-from .logger import TaskFailure, format_content, log_report
+from .logger import TaskFailure, format_content, log_report, logging
 
 # Parse and unpack debugging options
 ns = parse_args()
@@ -14,6 +14,9 @@ windowed: bool = ns.window
 d: bool = ns.discord
 i: bool = ns.instagram
 s: bool = ns.spotify
+
+if console_only:
+    logging.disable(100)
 
 # Run program
 fails = TaskFailure()

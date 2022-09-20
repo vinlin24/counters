@@ -3,12 +3,20 @@
 Handles logging the status of the run to the dedicated log file.
 """
 
+import logging
 import traceback
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
 from .config import LOG_FILE_PATH
+
+logging.basicConfig(filename=LOG_FILE_PATH,
+                    filemode="at",
+                    encoding="utf-8",
+                    level=logging.INFO,
+                    format="[%(asctime)s] %(message)s")
+log = logging.getLogger(__package__)
 
 
 @dataclass
