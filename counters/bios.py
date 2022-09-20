@@ -9,6 +9,7 @@ from datetime import date, datetime
 from typing import Literal
 
 from .config import DATE_FORMAT, JSON_FILE_PATH
+from .logger import log
 
 
 def day_number(start: date) -> int:
@@ -70,10 +71,12 @@ def load_json() -> LoadedDict:
                 _convert_start_date(entry)
         # Schema inconsistency
         else:
-            raise ValueError(
+            e = ValueError(
                 f"Expected a dict or list as the value for key {key}, "
                 f"got {type(val).__name__} instead."
             )
+            log.error(e)
+            raise e
 
     return data
 
@@ -160,3 +163,26 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
         result.append(kwargs)
 
     return result
+
+
+def get_github_task(data: LoadedDict) -> str | None:
+    """Prepare the "bio" argument to pass to update_profile_bio().
+
+    Args:
+        data (LoadedDict): The loaded and configured data from the
+        central JSON file.
+
+    Returns:
+        str | None: The instantiated bio template to pass to
+        update_profile_bio(), or None if opted out of updating bio.
+    """
+    # Extract GitHub part
+    task: dict = data["github"]  # type: ignore
+
+    # Fill placeholder in bio template if provided
+    start: date | None = task["start"]
+    bio: str | None = task["bio"]
+    if start is not None and bio is not None:
+        bio = bio.format(day_number(start))
+
+    return bio

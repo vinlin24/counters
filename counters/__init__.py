@@ -10,8 +10,9 @@ from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
 
-from .bios import (get_discord_task, get_instagram_task, get_spotify_tasks,
-                   load_json)
+# TODO: Somehow combine the get_* and update_* functions to not clutter
+from .bios import (get_discord_task, get_github_task, get_instagram_task,
+                   get_spotify_tasks, load_json)
 from .config import EDGE_DRIVER_PATH, WAIT_TIMEOUT
 from .logger import TaskFailure
 from .update_discord import update_status
@@ -149,7 +150,7 @@ def run_program(fails: TaskFailure,
 
     if github:
         try:
-            github_bio = "hello there"  # TODO: get_github_task(data)
+            github_bio = get_github_task(data)
             update_profile_bio(driver, github_bio)
             print("Updated GitHub bio.")
         except Exception as e:
