@@ -1,7 +1,7 @@
 """bios.py
 
-Load the central JSON file, fill placeholders, and call the respective
-update handlers.
+Defines functions that load the central JSON file, fill placeholders,
+and prepare the arguments to pass to their respective update handlers.
 """
 
 import json
@@ -79,7 +79,7 @@ def load_json() -> LoadedDict:
 
 
 def get_discord_task(data: LoadedDict) -> str | None:
-    """Prepare the "status" argument to pass to update_discord().
+    """Prepare the "status" argument to pass to update_status().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
@@ -87,7 +87,7 @@ def get_discord_task(data: LoadedDict) -> str | None:
 
     Returns:
         str | None: The instantiated status template to pass to
-        update_discord(), or None if opted out of updating status.
+        update_status(), or None if opted out of updating status.
     """
     # Extract Discord part
     task: dict = data["discord"]  # type: ignore
@@ -102,7 +102,7 @@ def get_discord_task(data: LoadedDict) -> str | None:
 
 
 def get_instagram_task(data: LoadedDict) -> str | None:
-    """Prepare the "bio" argument to pass to update_instagram().
+    """Prepare the "bio" argument to pass to update_bio().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
@@ -110,7 +110,7 @@ def get_instagram_task(data: LoadedDict) -> str | None:
 
     Returns:
         str | None: The instantiated bio template to pass to
-        update_instagram(), or None if opted out of updating bio.
+        update_bio(), or None if opted out of updating bio.
     """
     # Extract Instagram part
     task: dict = data["instagram"]  # type: ignore
