@@ -9,7 +9,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from .config import GITHUB_EMAIL, GITHUB_PASSWORD, GITHUB_PROFILE_URL
-from .selectors.github import EMAIL_INPUT, PASSWORD_INPUT
+from .selectors.github import (BIO_TEXTAREA, EDIT_PROFILE_BUTTON, EMAIL_INPUT,
+                               PASSWORD_INPUT, SAVE_BUTTON)
 
 # ==================== SCRAPING SUBROUTINES ==================== #
 
@@ -31,6 +32,21 @@ def _login(driver: webdriver.Edge) -> None:
     password_input.send_keys(GITHUB_PASSWORD + "\n")
 
 
+def _update_bio(driver: webdriver.Edge, bio: str) -> None:
+    # Enter edit profile mode
+    edit_button = driver.find_element(By.CSS_SELECTOR, EDIT_PROFILE_BUTTON)
+    edit_button.click()
+
+    # Edit the bio content
+    bio_box = driver.find_element(By.CSS_SELECTOR, BIO_TEXTAREA)
+    bio_box.clear()
+    bio_box.send_keys(bio)
+
+    # Save the changes
+    save_button = driver.find_element(By.CSS_SELECTOR, SAVE_BUTTON)
+    save_button.click()
+
+
 # ==================== INTERFACE FUNCTION ==================== #
 
 
@@ -46,3 +62,4 @@ def update_profile_bio(driver: webdriver.Edge, bio: str | None) -> None:
     # Webscraping sequences
     driver.get(login_url)
     _login(driver)
+    _update_bio(driver, bio)
