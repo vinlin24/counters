@@ -79,7 +79,8 @@ python -m counters <# options #>
 | `-w/--window`    | Run the Selenium web scraper in an open browser window instead of headlessly.                                                                                           |
 | `-d/--discord`   | See below.                                                                                                                                                              |
 | `-i/--instagram` | See below.                                                                                                                                                              |
-| `-s/--spotify`   | If any of these 3 switches are included, run these select tasks. Otherwise if all 3 switches are absent from the command line, use the default behavior of running all. |
+| `-s/--spotify`   | See below.                                                                                                                                                              |
+| `-g/--github`    | If any of these 4 switches are included, run these select tasks. Otherwise if all 4 switches are absent from the command line, use the default behavior of running all. |
 
 ## Setup
 
