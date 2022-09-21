@@ -16,40 +16,11 @@ I placed a configuration file at:
 ```
 If it's missing, you should make one at this path. A log file is also maintained in this directory.
 
-As of now, the `bios.json` file should have the following schema:
+As of now, the `bios.json` file should conform to the provided schema, [`bios.schema.json`](schema/bios.schema.json).
 
-```json
-{
-  "discord": {
-    "status": "string | null",
-    "start": "YYYY-MM-DD | null"
-  },
-  "instagram": {
-    "bio": "string | null",
-    "start": "YYYY-MM-DD | null"
-  },
-  "spotify": [
-    {
-      "comment": "any",
-      "playlist_id": "string",
-      "name": "string | null",
-      "description": "string | null",
-      "start": "YYYY-MM-DD | null"
-    },
-    {
-      "comment": "any",
-      "playlist_id": "string",
-      "name": "string | null",
-      "description": "string | null",
-      "start": "YYYY-MM-DD | null"
-    }
-  ],
-  "github": {
-    "bio": "string | null",
-    "start": "YYYY-MM-DD | null"
-  }
-}
-```
+> In VS Code, you can include the special `$schema` key in `bios.json` and set it to the path of `bios.json.schema` to validate it with IntelliSense. Supposedly you can validate without modifying the JSON itself [by using settings](https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings), but I couldn't get it to work - `fileMatch` or `url` or both just wasn't picking up the right paths.
+
+Notes:
 
 - The strings to display (`status`, `bio`, `description`) can include, but don't need to, a `{0}` placeholder for where the day number will go. Example:
   ```json
@@ -59,7 +30,7 @@ As of now, the `bios.json` file should have the following schema:
   ```
 - The `start` keys are dates to be considered as "Day 1" in the count.
 - For each Spotify playlist entry, you have the option to change either the playlist name, description, or both. Leaving a key as `null` signifies leaving it unchanged.
-- The `comment` keys are not used. They're just a way to document each playlist entry for yourself.
+- The `comment` keys are not used nor are they required by the schema. They're just a way to document each playlist entry for yourself.
 
 ## Usage
 
