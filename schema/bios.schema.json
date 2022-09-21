@@ -4,6 +4,9 @@
   "description": "Templates to use for the counters program",
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "discord": {
       "type": "object",
       "properties": {

@@ -62,6 +62,9 @@ def load_json() -> LoadedDict:
 
     # Convert "start" values to date objects
     for key, val in data.items():
+        # Optional $schema key
+        if key == "$schema":
+            continue
         # Task objects
         if isinstance(val, dict):
             _convert_start_date(val)
