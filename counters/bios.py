@@ -8,7 +8,9 @@ import json
 from datetime import date, datetime
 from typing import Literal
 
-from .config import DATE_FORMAT, JSON_FILE_PATH
+import jsonschema
+
+from .config import DATE_FORMAT, JSON_FILE_PATH, JSON_SCHEMA_PATH
 from .logger import log
 
 
@@ -41,6 +43,25 @@ def _convert_start_date(d: dict[str, str | None]) -> None:
     d["start"] = dt.date()  # type: ignore
 
 
+def _validate_json() -> dict:
+    """Validate the JSON to load, returning it if successful.
+
+    Raises:
+        jsonschema.ValidationError: If the JSON to load is invalid.
+        jsonschema.SchemaError: If the schema itself is invalid.
+
+    Returns:
+        dict: The JSON data if validated successfully.
+    """
+    with JSON_SCHEMA_PATH.open("rt", encoding="utf-8") as fp:
+        schema = json.load(fp)
+    with JSON_FILE_PATH.open("rt", encoding="utf-8") as fp:
+        data = json.load(fp)
+
+    jsonschema.validate(instance=data, schema=schema)
+    return data
+
+
 LoadedDict = dict[Literal["discord", "instagram", "spotify"],
                   dict[str, str | None] |
                   list[dict[str, str | None | date]]]
@@ -57,10 +78,10 @@ def load_json() -> LoadedDict:
         LoadedDict: The loaded data. Start dates are converted from str
         to datetime.date objects.
     """
-    with open(JSON_FILE_PATH, "rt") as fp:
-        data: dict = json.load(fp)
+    # Validate first
+    data = _validate_json()
 
-    # Convert "start" values to date objects
+    # Postprocessing: convert "start" values to date objects in-place
     for key, val in data.items():
         # Optional $schema key
         if key == "$schema":
@@ -72,14 +93,6 @@ def load_json() -> LoadedDict:
         elif isinstance(val, list):
             for entry in val:
                 _convert_start_date(entry)
-        # Schema inconsistency
-        else:
-            e = ValueError(
-                f"Expected a dict or list as the value for key {key}, "
-                f"got {type(val).__name__} instead."
-            )
-            log.error(e)
-            raise e
 
     return data
 
