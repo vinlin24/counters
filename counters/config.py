@@ -21,7 +21,7 @@ JSON_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "bios.schema.json"
 """Absolute path to the schema for the central JSON file."""
 
 DATE_FORMAT = "%Y-%m-%d"
-"""String format to encode dates in the centrala JSON file."""
+"""String format to encode dates in the central JSON file."""
 
 LOG_FILE_PATH = JSON_FILE_PATH.parent / "counters.log"
 """Absolute path to the program log file."""
@@ -37,7 +37,7 @@ specific to my local machine.
 
 NOTE: The executable has to be replaced with a newer version every time
 the Edge web browser is updated such that the driver and the browser
-applicatin are compatible with each other.
+application are compatible with each other.
 """
 
 WAIT_TIMEOUT = 15.0

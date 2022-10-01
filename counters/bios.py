@@ -11,7 +11,6 @@ from typing import Literal
 import jsonschema
 
 from .config import DATE_FORMAT, JSON_FILE_PATH, JSON_SCHEMA_PATH
-from .logger import log
 
 
 def day_number(start: date) -> int:

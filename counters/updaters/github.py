@@ -51,6 +51,14 @@ def _update_bio(driver: webdriver.Edge, bio: str) -> None:
 
 
 def update_profile_bio(driver: webdriver.Edge, bio: str | None) -> None:
+    """Update GitHub profile bio with new text.
+
+    Args:
+        driver (webdriver.Edge): Edge web driver instance.
+        status (str | None, optional): New bio text. Defaults to None,
+        meaning leave the status unchanged, in which case, this
+        function does nothing.
+    """
     if bio is None:
         return
 

@@ -24,7 +24,7 @@ full xpath from before.
 BIO_BOX = "#pepBio"
 """Input text area for updating the user bio."""
 
-SUBMIT_BUTTON = "._acan._acap._acas"
+SUBMIT_BUTTON = "._acan._acap._acas"  # cspell: disable-line
 """Submit button on the "Edit profile" page."""
 
 XPATH_PROFILE_SAVED = "/html/body/div[3]/div[1]/div/div/div/p"

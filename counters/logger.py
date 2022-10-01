@@ -38,7 +38,7 @@ class TaskFailure:
     spotify: dict[str | None, Exception] = \
         field(default_factory=dict)
     """Mapping of Spotify playlist ID to the error in its task.
-    
+
     The key None is used for an error in getting the Spotify tasks
     itself and not in running the task for the playlist.
     """
@@ -91,7 +91,7 @@ def format_content(fails: TaskFailure,
 
     Postcondition:
         Not that any function gives a shit after this but
-        `fails.spotify[None]`, if exists, is popped. 
+        `fails.spotify[None]`, if exists, is popped.
     """
     if fails.all_good():
         return None
@@ -174,5 +174,5 @@ def log_report(report: str | None) -> None:
     else:
         entry += f"Encountered errors:\n{report}\n"
 
-    with open(LOG_FILE_PATH, "at") as fp:
+    with open(LOG_FILE_PATH, "at", encoding="utf-8") as fp:
         fp.write(entry)

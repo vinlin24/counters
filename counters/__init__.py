@@ -57,7 +57,7 @@ def parse_args() -> Namespace:
     ns = parser.parse_args(sys.argv[1:])
 
     # Argument postprocessing:
-    # If none of these swithces were supplied, run all as default behavior
+    # If none of these switches were supplied, run all as default behavior
     # This way it doesn't break the task set up in Task Scheduler
     if not any((ns.discord, ns.instagram, ns.spotify, ns.github)):
         ns.discord = ns.instagram = ns.spotify = ns.github = True
