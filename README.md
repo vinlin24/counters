@@ -4,7 +4,7 @@
 
 ## Description
 
-Sometimes I want my status to keep track of certain day counts, like "Day X of..." For example, my GitHub bio is currently set up to say "Day X of waiting for HSSEAS to let me let them let me in", in passive protest to how I'm still not allowed to apply for my switch to Computer Science. [Check it out](https://github.com/vinlin24) right now!
+Sometimes I want my status to keep track of certain day counts, like "Day X of..." For example, my GitHub bio is currently set up to say "Day X of waiting for HSSEAS to let me in" in wait for the results of my application to switch to Computer Science. [Check it out](https://github.com/vinlin24) right now!
 
 I originally had a few standalone, hard-coded scripts for Discord, Instagram, and Spotify. This project seeks to just bring them together and one place and make them more configurable. The original standalone scripts are included in the [standalones/](standalones/) directory just for record. I am 100% sure they do not work anymore.
 
