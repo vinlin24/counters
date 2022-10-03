@@ -84,7 +84,9 @@ python -m counters <# options #>
 
 Here's a screen recording of this program at work. I included the `--window` and `--console` flags for demonstration purposes only. The scheduled task runs the package without any [command line arguments](#usage-running-on-demand), so it does not spawn a browser window and logs to the log file instead of to a console.
 
-<!-- Drag and drop into GitHub directly -->
+https://user-images.githubusercontent.com/67369899/193505930-4922aa20-6896-4d39-9531-2f8c2a88b2dd.mp4
+
+The Spotify task uses the [tekore](docs/DEVELOPMENT.md#development-details) library to directly communicate with the Spotify Web API instead of using Selenium, so it is not visible in the demo.
 
 And here's a snapshot of the overview of the Task Scheduler task I set up. The full details can be found [here](docs/SETUP.md).
 
