@@ -6,7 +6,7 @@
 
 Sometimes I want my status to keep track of certain day counts, like "Day X of..." For example, my GitHub bio is currently set up to say "Day X of waiting for HSSEAS to let me in" in wait for the results of my application to switch to Computer Science. [Check it out](https://github.com/vinlin24) right now!
 
-I originally had a few standalone, hard-coded scripts for Discord, Instagram, and Spotify. This project seeks to just bring them together and one place and make them configurable and extendable. The original standalone scripts are included in the [standalones](standalones/) directory just for record. I am 100% sure they do not work anymore.
+I originally had a few standalone, hard-coded scripts for Discord, Instagram, and Spotify. This project seeks to just bring them together and one place and make them configurable and extendable. The original standalone scripts are included in the [standalones](standalones) directory just for record. I am 100% sure they do not work anymore.
 
 ## Configuration: Bio Templates
 
@@ -61,9 +61,9 @@ Notes:
 
 ## Usage: Running on Demand
 
-Since this program is meant to automate, it should be hooked up to a [scheduler](docs/SETUP.md) to be run periodically. That way, the statuses on all platforms update automatically, and all you need to do when you want to change the templates is edit the [bios.json file](#configuration).
+Since this program is meant to automate, it should be hooked up to a [scheduler](docs/SETUP.md) to be run periodically. That way, the statuses on all platforms update automatically, and all you need to do when you want to change the templates is edit the [bios.json file](#configuration-bio-templates).
 
-But for debugging/development purposes, the code can be run on demand with some command line options:
+But for debugging/development purposes, the code can be [run on demand](#demo) with some command line options:
 
 ```powershell
 cd path\to\this\repo
@@ -79,6 +79,16 @@ python -m counters <# options #>
 | `-i/--instagram` | See below.                                                                                                                                                              |
 | `-s/--spotify`   | See below.                                                                                                                                                              |
 | `-g/--github`    | If any of these 4 switches are included, run these select tasks. Otherwise if all 4 switches are absent from the command line, use the default behavior of running all. |
+
+## Demo
+
+Here's a screen recording of this program at work. I included the `--window` and `--console` flags for demonstration purposes only. The scheduled task runs the package without any [command line arguments](#usage-running-on-demand), so it does not spawn a browser window and logs to the log file instead of to a console.
+
+<!-- Drag and drop into GitHub directly -->
+
+And here's a snapshot of the overview of the Task Scheduler task I set up. The full details can be found [here](docs/SETUP.md).
+
+![Task Scheduler Overview](demo/task-scheduler-overview.png)
 
 ## Development: Environment Recovery
 
