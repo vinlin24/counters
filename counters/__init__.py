@@ -9,11 +9,12 @@ from argparse import ArgumentParser, Namespace
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 # TODO: Somehow combine the get_* and update_* functions to not clutter
 from .bios import (get_discord_task, get_github_task, get_instagram_task,
                    get_spotify_tasks, load_json)
-from .config import EDGE_DRIVER_PATH, WAIT_TIMEOUT
+from .config import WAIT_TIMEOUT
 from .logger import TaskFailure
 from .updaters import (update_bio, update_playlist, update_profile_bio,
                        update_status)
@@ -95,7 +96,7 @@ def run_program(fails: TaskFailure,
 
     # Initialize Edge driver
     try:
-        service = Service(str(EDGE_DRIVER_PATH))
+        service = Service(EdgeChromiumDriverManager().install())
         options = Options()
         options.headless = not windowed
         # Headless option by default causes window to be tiny, which interferes

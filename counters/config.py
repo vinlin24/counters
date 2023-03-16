@@ -29,17 +29,6 @@ LOG_FILE_PATH = JSON_FILE_PATH.parent / "counters.log"
 
 # ==================== SELENIUM ==================== #
 
-EDGE_DRIVER_PATH = Path(__file__).parent / "msedgedriver.exe"
-"""Absolute path to my Edge web driver executable.
-
-Changed: Include executable in package itself instead of a path
-specific to my local machine.
-
-NOTE: The executable has to be replaced with a newer version every time
-the Edge web browser is updated such that the driver and the browser
-application are compatible with each other.
-"""
-
 WAIT_TIMEOUT = 15.0
 """Time in seconds to implicitly wait for a webpage to load."""
 
