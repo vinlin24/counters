@@ -5,11 +5,14 @@ Entry point.
 
 import sys
 
+from colorama import Fore
+
 from . import parse_args, run_program
 from .bios import get_config_output
 from .config import JSON_FILE_PATH
 from .emailer import send_email
-from .logger import TaskFailure, format_content, log_report, logging
+from .logger import (TaskFailure, format_content, get_last_success_timestamp,
+                     log_report, logging)
 
 # Parse and unpack debugging options
 ns = parse_args()
@@ -33,7 +36,9 @@ if dry_run:
         f"as loaded from {JSON_FILE_PATH}:\n"
     )
     print("\n".join(output_lines))
-    print("\nTo execute, drop the `--dry-run` flag.\n")
+    print("\nTo execute, drop the `--dry-run` flag.")
+    timestamp = get_last_success_timestamp()
+    print(f"{Fore.BLACK}Last successful run was at {timestamp}.{Fore.RESET}\n")
     sys.exit(0)
 
 # Run program

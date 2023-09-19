@@ -4,10 +4,13 @@ Handles logging the status of the run to the dedicated log file.
 """
 
 import logging
+import os
+import re
 import traceback
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Generator
 
 from .config import LOG_FILE_PATH
 
@@ -176,3 +179,59 @@ def log_report(report: str | None) -> None:
 
     with open(LOG_FILE_PATH, "at", encoding="utf-8") as fp:
         fp.write(entry)
+
+
+def get_last_success_timestamp() -> datetime | None:
+    """
+    Parse the log file for the most recent "No problems detected." entry
+    and return the timestamp at which it was logged. Return None if no
+    such entry could be found.
+    """
+    matcher = re.compile(r"\[(.+?)\] No problems detected.")
+    for line in _reverse_readline(LOG_FILE_PATH):
+        match = matcher.match(line)
+        if match is not None:
+            timestamp: str = match.group(1)
+            return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
+    return None
+
+
+def _reverse_readline(
+    filename: str | Path,
+    buf_size: int = 8192
+) -> Generator[str, None, None]:
+    """Yield the lines of a file in reverse order.
+
+    Code from: https://stackoverflow.com/a/23646049/14226122.
+    """
+    with open(filename, "rb") as fh:
+        segment = None
+        offset = 0
+        fh.seek(0, os.SEEK_END)
+        file_size = remaining_size = fh.tell()
+        while remaining_size > 0:
+            offset = min(file_size, offset + buf_size)
+            fh.seek(file_size - offset)
+            buffer = fh.read(
+                min(remaining_size, buf_size)).decode(
+                encoding="utf-8")
+            remaining_size -= buf_size
+            lines = buffer.split("\n")
+            # The first line of the buffer is probably not a complete
+            # line so we'll save it and append it to the last line of
+            # the next buffer we read
+            if segment is not None:
+                # If the previous chunk starts right from the beginning
+                # of line do not concat the segment to the last line of
+                # new chunk. Instead, yield the segment first
+                if buffer[-1] != "\n":
+                    lines[-1] += segment
+                else:
+                    yield segment
+            segment = lines[0]
+            for index in range(len(lines) - 1, 0, -1):
+                if lines[index]:
+                    yield lines[index]
+        # Don't yield None if the file was empty
+        if segment is not None:
+            yield segment
