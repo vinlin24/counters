@@ -55,6 +55,8 @@ def parse_args() -> Namespace:
     parser.add_argument("-i", "--instagram", action="store_true")
     parser.add_argument("-s", "--spotify", action="store_true")
     parser.add_argument("-g", "--github", action="store_true")
+    # Read configuration file and output what would be run
+    parser.add_argument("-n", "--dry-run", action="store_true")
     ns = parser.parse_args(sys.argv[1:])
 
     # Argument postprocessing:
