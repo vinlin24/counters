@@ -100,6 +100,7 @@ python -m counters <# options #>
 | `-i/--instagram` | See below.                                                                                                                                                              |
 | `-s/--spotify`   | See below.                                                                                                                                                              |
 | `-g/--github`    | If any of these 4 switches are included, run these select tasks. Otherwise if all 4 switches are absent from the command line, use the default behavior of running all. |
+| `-n/--dry-run`   | Just load the configuration settings and output the values the program *would* run with.                                                                                |
 
 ## Demo
 
