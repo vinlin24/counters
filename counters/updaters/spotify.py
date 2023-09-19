@@ -19,7 +19,8 @@ spotify = tekore.Spotify(token.access_token)
 
 def update_playlist(playlist_id: str,
                     name: str | None = None,
-                    description: str | None = None
+                    description: str | None = None,
+                    **kwargs,  # Ignore extraneous config like `comment`
                     ) -> None:
     """Update Spotify playlist details.
 

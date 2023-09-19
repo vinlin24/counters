@@ -163,6 +163,7 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
         name: str | None = task["name"]
         description: str | None = task["description"]
         start: date | None = task["start"]
+        comment: str | None = task["comment"]
         if start is not None:
             if name is not None:
                 name = name.format(day_number(start))
@@ -173,7 +174,8 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
         kwargs = {
             "playlist_id": task["playlist_id"],
             "name": name,
-            "description": description
+            "description": description,
+            "comment": comment,
         }
         result.append(kwargs)
 
