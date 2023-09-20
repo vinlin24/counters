@@ -4,6 +4,7 @@ Entry point.
 """
 
 import sys
+from datetime import date
 
 from colorama import Fore
 
@@ -32,8 +33,8 @@ if dry_run:
     # Indent between the header and footer for a cooler effect I guess
     output_lines = [f"    {line}" for line in output_lines]
     print(
-        "\nThe values that will be used upon running this program, "
-        f"as loaded from {JSON_FILE_PATH}:\n"
+        "\nThe values that will be used upon running this program "
+        f"today {date.today()}, as loaded from {JSON_FILE_PATH}:\n"
     )
     print("\n".join(output_lines))
     print("\nTo execute, drop the `--dry-run` flag.")

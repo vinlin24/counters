@@ -253,7 +253,7 @@ def get_config_output() -> str:
         else:
             description = UNCHANGED_TEXT
         segment = (
-            f"✅ SPOTIFY: {ENABLED_TEXT}: ({comment or '?'})\n"
+            f"✅ SPOTIFY: {ENABLED_TEXT} ({comment or '?'})\n"
             f"id={Fore.BLACK}{playlist_id}{Fore.RESET}\n"
             f"name={name}\n"
             f"description={description}"
