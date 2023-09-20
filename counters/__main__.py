@@ -39,7 +39,8 @@ if dry_run:
     print("\n".join(output_lines))
     print("\nTo execute, drop the `--dry-run` flag.")
     timestamp = get_last_success_timestamp()
-    print(f"{Fore.BLACK}Last successful run was at {timestamp}.{Fore.RESET}\n")
+    if timestamp is not None:
+        print(f"{Fore.BLACK}Last successful run at {timestamp}.{Fore.RESET}\n")
     sys.exit(0)
 
 # Run program
