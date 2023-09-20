@@ -14,9 +14,12 @@ Computer Science.
 
 I originally had a few standalone, hard-coded scripts for Discord, Instagram,
 and Spotify. This project seeks to just bring them together and one place and
-make them configurable and extendable. The original standalone scripts are
-included in the [standalones](standalones) directory just for record. I am 100%
-sure they do not work anymore.
+make them configurable and extendable.
+
+<!--
+The original standalone scripts are included in the [standalones](standalones)
+directory just for record. I am 100% sure they do not work anymore.
+-->
 
 ## Configuration: Bio Templates
 
