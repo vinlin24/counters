@@ -9,8 +9,8 @@ from datetime import date
 from colorama import Fore
 
 from . import parse_args, run_program
-from .bios import get_config_output
 from .config import JSON_FILE_PATH
+from .dry_run import get_config_output
 from .emailer import send_email
 from .logger import (TaskFailure, format_content, get_last_success_timestamp,
                      log_report, logging)
