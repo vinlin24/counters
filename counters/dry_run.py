@@ -9,7 +9,9 @@ from typing import Any, Literal
 
 import rich.box
 import rich.traceback
-from rich.console import Console
+from rich.columns import Columns
+from rich.console import Console, Group
+from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
@@ -42,6 +44,7 @@ def format_task(
 
     table = Table(
         title=Text(platform, style=color),
+        title_justify="left",
         style=color,
     )
     # Make the enabled/disabled text appear as a "header".
@@ -69,7 +72,8 @@ def format_spotify_tasks(data: LoadedDict) -> list[Table]:
             description = UNCHANGED_TEXT
 
         table = Table(
-            title=Text("SPOTIFY", style="green"),
+            title=Text("SPOTIFY Playlist", style="green"),
+            title_justify="left",
             style="green",
         )
         # Make the enabled/disabled text appear as a "header".
@@ -89,8 +93,9 @@ def format_spotify_tasks(data: LoadedDict) -> list[Table]:
     # Prepare a single special "DISABLED" table.
     if len(tables) == 0:
         table = Table(
-            title=Text("SPOTIFY", style="green"),
-            style="green"
+            title=Text("SPOTIFY Playlist", style="green"),
+            title_justify="left",
+            style="green",
         )
         # Make the enabled/disabled text appear as a "header".
         table.add_column("", justify="right")
@@ -108,20 +113,35 @@ def print_dry_run() -> None:
 
     data = load_json()
 
-    console.print(
-        "\nThe values that will be used upon running this program "
-        f"today {date.today()}, as loaded from {JSON_FILE_PATH}:\n"
+    header = Panel(
+        "The values that will be used upon running this program "
+        f"today [bold]{date.today()}[/], as loaded from {JSON_FILE_PATH}:",
+        style="cyan",
+        expand=True,
     )
+    console.print(header)
+
+    columns: tuple[list[Table], list[Table]] = ([], [])
 
     for platform in ("DISCORD", "INSTAGRAM", "GITHUB"):
         table = format_task(platform, data)
-        console.print(table)
+        columns[0].append(table)
 
     tables = format_spotify_tasks(data)
     for table in tables:
-        console.print(table)
+        columns[1].append(table)
 
-    console.print("\nTo execute, drop the `--dry-run` flag.")
+    groups = [Group(*columns[0]), Group(*columns[1])]
+    console.print(Columns(groups), justify="center")
+
     timestamp = get_last_success_timestamp()
     if timestamp is not None:
-        console.print(f"[black]Last successful run at {timestamp}.[/]\n")
+        timestamp_text = f"\n[black]Last successful run at {timestamp}.[/]"
+    else:
+        timestamp_text = ""
+    footer = Panel(
+        "To execute, drop the `--dry-run` flag when running directly "
+        f"or when scheduling.{timestamp_text}",
+        expand=True,
+    )
+    console.print(footer)
