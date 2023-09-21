@@ -12,6 +12,7 @@ import rich.traceback
 from rich.columns import Columns
 from rich.console import Console, Group
 from rich.panel import Panel
+from rich.style import Style
 from rich.table import Table
 from rich.text import Text
 
@@ -20,15 +21,15 @@ from .bios import (LoadedDict, get_discord_task, get_github_task,
 from .config import JSON_FILE_PATH
 from .logger import get_last_success_timestamp
 
-DISABLED_TEXT = Text("✗ DISABLED", style="red")
-ENABLED_TEXT = Text("✓ ENABLED", style="green")
-UNCHANGED_TEXT = Text("<unchanged>", style="black")
+DISABLED_TEXT = Text("✗ DISABLED", style=Style(color="red", bold=True))
+ENABLED_TEXT = Text("✓ ENABLED", style=Style(color="green", bold=True))
+UNCHANGED_TEXT = Text("<unchanged>", style=Style(color="black"))
 
 
 def format_task(
     platform: Literal["DISCORD", "INSTAGRAM", "GITHUB"],
     data: LoadedDict,
-) -> Table:
+) -> Panel:
     task: str | None
     color: str
     match platform:
@@ -42,71 +43,74 @@ def format_task(
             task = get_github_task(data)
             color = "white"
 
-    table = Table(
+    header = (DISABLED_TEXT if task is None else ENABLED_TEXT).copy()
+    header.justify = "right"
+
+    null_text = Text("(config was `null`)", style="black")
+    body = Panel(
+        null_text if task is None else Text(task, style="reset"),
+        style=color,
+    )
+
+    return Panel(
+        Group(header, body),
         title=Text(platform, style=color),
-        title_justify="left",
+        title_align="left",
         style=color,
         expand=True,
     )
-    # Make the enabled/disabled text appear as a "header".
-    table.add_column("", justify="right")
-    if task is None:
-        table.add_column(DISABLED_TEXT)
-        table.add_row("bio", Text("(config was `null`)", style="black"))
-    else:
-        table.add_column(ENABLED_TEXT)
-        table.add_row("bio", task)
-    return table
 
 
-def format_spotify_tasks(data: LoadedDict) -> list[Table]:
-    def format_spotify_task(task: dict[str, Any]) -> Table:
+def format_spotify_tasks(data: LoadedDict) -> list[Panel]:
+    def format_spotify_task(task: dict[str, Any]) -> Panel:
         playlist_id = task["playlist_id"]
-        comment = task["comment"]
+        comment = Text(task["comment"])
         if task["name"]:
-            name = task['name']
+            name = Text(task["name"])
         else:
             name = UNCHANGED_TEXT
         if task["description"]:
-            description = task['description']
+            description = Text(task["description"])
         else:
             description = UNCHANGED_TEXT
 
-        table = Table(
-            title=Text("SPOTIFY Playlist", style="green"),
-            title_justify="left",
-            style="green",
-            expand=True,
-        )
-        # Make the enabled/disabled text appear as a "header".
-        table.add_column("", justify="right")
-        table.add_column(ENABLED_TEXT)
+        header = (DISABLED_TEXT if task is None else ENABLED_TEXT).copy()
+        header.justify = "right"
 
+        table = Table(style="green", show_header=False)
+        table.add_column("", style="reset", justify="right")
+        table.add_column("", style="reset")
         table.add_row("id", Text(playlist_id, style="black"))
         table.add_row("comment", comment or "?")
         table.add_row("name", name)
         table.add_row("description", description)
 
-        return table
-
-    spotify_tasks = get_spotify_tasks(data)
-    tables = [format_spotify_task(task) for task in spotify_tasks]
-
-    # Prepare a single special "DISABLED" table.
-    if len(tables) == 0:
-        table = Table(
+        return Panel(
+            Group(header, table),
             title=Text("SPOTIFY Playlist", style="green"),
-            title_justify="left",
+            title_align="left",
             style="green",
             expand=True,
         )
-        # Make the enabled/disabled text appear as a "header".
-        table.add_column("", justify="right")
-        table.add_column(DISABLED_TEXT)
-        table.add_row("", Text("(config was `[]`)", style="black"))
-        tables = [table]
 
-    return tables
+    spotify_tasks = get_spotify_tasks(data)
+    panels = [format_spotify_task(task) for task in spotify_tasks]
+
+    # Prepare a single special "DISABLED" panel.
+    if len(panels) == 0:
+        header = DISABLED_TEXT.copy()
+        header.justify = "right"
+        panel = Panel(
+            Group(header, Panel(Text("(config was `[]`)", style="black"))),
+            title=Text("SPOTIFY Playlist", style="green"),
+            title_align="left",
+            style="green",
+            expand=True,
+        )
+
+        panels = [panel]
+
+    return panels
 
 
 def print_dry_run() -> None:
@@ -124,15 +128,15 @@ def print_dry_run() -> None:
     )
     console.print(header)
 
-    columns: tuple[list[Table], list[Table]] = ([], [])
+    columns: tuple[list[Panel], list[Panel]] = ([], [])
 
     for platform in ("DISCORD", "INSTAGRAM", "GITHUB"):
-        table = format_task(platform, data)
-        columns[0].append(table)
+        panel = format_task(platform, data)
+        columns[0].append(panel)
 
-    tables = format_spotify_tasks(data)
-    for table in tables:
-        columns[1].append(table)
+    panels = format_spotify_tasks(data)
+    for panel in panels:
+        columns[1].append(panel)
 
     groups = [Group(*columns[0]), Group(*columns[1])]
     console.print(Columns(groups), justify="center")
