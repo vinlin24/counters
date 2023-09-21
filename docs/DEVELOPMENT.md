@@ -12,14 +12,13 @@ environment variables. The required keys are:
 - `SPOTIFY_CLIENT_ID`
 - `SPOTIFY_CLIENT_SECRET`
 - `SPOTIFY_USER_REFRESH`
-- `GITHUB_PROFILE_URL`
-- `GITHUB_EMAIL`
-- `GITHUB_PASSWORD `
+- `GITHUB_PAT`
 - `ERROR_EMAIL`
 - `ERROR_EMAIL_PASSWORD`
 
-You should obviously know your own email, username, and password credentials.
-`GITHUB_PROFILE_URL` happens to be https://github.com/vinlin24 for me.
+`GITHUB_PAT` can be regenerated in the [user developer
+settings](https://github.com/settings/tokens).
+
 `ERROR_EMAIL` and `ERROR_EMAIL_PASSWORD` is the email and password to send and
 receive error reports.
 

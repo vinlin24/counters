@@ -46,12 +46,17 @@ SPOTIFY_CLIENT_SECRET = os.environ["SPOTIFY_CLIENT_SECRET"]
 SPOTIFY_REDIRECT_URI = os.environ["SPOTIFY_REDIRECT_URI"]
 SPOTIFY_USER_REFRESH = os.environ["SPOTIFY_USER_REFRESH"]
 
-GITHUB_PROFILE_URL = os.environ["GITHUB_PROFILE_URL"]
-GITHUB_EMAIL = os.environ["GITHUB_EMAIL"]
-GITHUB_PASSWORD = os.environ["GITHUB_PASSWORD"]
+GITHUB_PAT = os.environ["GITHUB_PAT"]
+"""GitHub personal access token."""
 
 ERROR_EMAIL = os.environ["ERROR_EMAIL"]
 """My email to send and receive error reports."""
 
 ERROR_EMAIL_PASSWORD = os.environ["ERROR_EMAIL_PASSWORD"]
 """Password to ERROR_EMAIL."""
+
+# PROFILE_PATH = os.environ["PROFILE_PATH"]
+# """Full path to browser profile to use."""
+
+# USER_AGENT = os.environ["USER_AGENT"]
+# """User-Agent string to use."""
