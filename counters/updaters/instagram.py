@@ -4,16 +4,16 @@ Interface for updating Instagram bio.
 """
 
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, WAIT_TIMEOUT
-from ..logger import log
+from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME
 from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
-                                   SUBMIT_BUTTON, USERNAME_INPUT,
-                                   XPATH_NOT_NOW_BUTTON, XPATH_PROFILE_SAVED)
+                                   USERNAME_INPUT, XPATH_NOT_NOW_BUTTON,
+                                   XPATH_SUBMIT_BUTTON)
 
 
 def _login(driver: webdriver.Edge) -> None:
@@ -42,15 +42,15 @@ def _navigate_to_profile(driver: webdriver.Edge) -> None:
         driver (webdriver.Edge): Edge web driver instance.
     """
     # Dismiss the "Save login info" if it appears
+    condition = EC.presence_of_element_located(
+        (By.XPATH, XPATH_NOT_NOW_BUTTON)
+    )
     try:
-        not_now_button = driver.find_element(By.XPATH, XPATH_NOT_NOW_BUTTON)
+        not_now_button: WebElement = WebDriverWait(driver, 5).until(condition)
         not_now_button.click()
-    # I have no idea why this happens
-    except WebDriverException:
-        pass
-
-    # Just redirect lol, not dealing with more popup shit
-    driver.get("https://www.instagram.com/accounts/edit/")
+    except TimeoutException:
+        # Just try to redirect again bro sigh
+        driver.get("https://www.instagram.com/accounts/edit")
 
 
 def _update_profile(driver: webdriver.Edge, bio: str) -> None:
@@ -66,23 +66,24 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     """
     # Find elements
     bio_box = driver.find_element(By.CSS_SELECTOR, BIO_BOX)
-    submit_button = driver.find_element(By.CSS_SELECTOR, SUBMIT_BUTTON)
 
     # Submit new bio string
     bio_box.clear()
     bio_box.send_keys(bio)
+
     # NOTE: If you don't edit anything, the button will be disabled
+    submit_button = driver.find_element(By.XPATH, XPATH_SUBMIT_BUTTON)
     submit_button.click()
 
     # Make sure the update registered
-    try:
-        WebDriverWait(driver, WAIT_TIMEOUT).until(
-            EC.presence_of_element_located((By.XPATH, XPATH_PROFILE_SAVED))
-        )
-    except TimeoutException:
-        print("Couldn't locate 'Profile saved' flash notification.")
-        log.error("Couldn't locate 'Profile saved' flash notification.")
-        raise
+    # try:
+    #     WebDriverWait(driver, WAIT_TIMEOUT).until(
+    #         EC.presence_of_element_located((By.XPATH, XPATH_PROFILE_SAVED))
+    #     )
+    # except TimeoutException:
+    #     print("Couldn't locate 'Profile saved' flash notification.")
+    #     log.error("Couldn't locate 'Profile saved' flash notification.")
+    #     raise
 
 
 def update_bio(driver: webdriver.Edge, bio: str | None = None) -> None:
@@ -98,7 +99,7 @@ def update_bio(driver: webdriver.Edge, bio: str | None = None) -> None:
         return
 
     # Webscraping sequences
-    driver.get("https://www.instagram.com/direct/inbox/")
+    driver.get("https://www.instagram.com/accounts/edit")
     _login(driver)
     _navigate_to_profile(driver)
     _update_profile(driver, bio)
