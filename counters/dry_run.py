@@ -77,7 +77,7 @@ def format_spotify_tasks(data: LoadedDict) -> list[Panel]:
         header = (DISABLED_TEXT if task is None else ENABLED_TEXT).copy()
         header.justify = "right"
 
-        table = Table(style="green", show_header=False)
+        table = Table(style="green", show_header=False, expand=True)
         table.add_column("", style="reset", justify="right")
         table.add_column("", style="reset")
         table.add_row("id", Text(playlist_id, style="black"))
