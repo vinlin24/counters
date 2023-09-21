@@ -46,6 +46,7 @@ def format_task(
         title=Text(platform, style=color),
         title_justify="left",
         style=color,
+        expand=True,
     )
     # Make the enabled/disabled text appear as a "header".
     table.add_column("", justify="right")
@@ -75,6 +76,7 @@ def format_spotify_tasks(data: LoadedDict) -> list[Table]:
             title=Text("SPOTIFY Playlist", style="green"),
             title_justify="left",
             style="green",
+            expand=True,
         )
         # Make the enabled/disabled text appear as a "header".
         table.add_column("", justify="right")
@@ -96,6 +98,7 @@ def format_spotify_tasks(data: LoadedDict) -> list[Table]:
             title=Text("SPOTIFY Playlist", style="green"),
             title_justify="left",
             style="green",
+            expand=True,
         )
         # Make the enabled/disabled text appear as a "header".
         table.add_column("", justify="right")
