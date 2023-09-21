@@ -1,61 +1,127 @@
-from colorama import Fore
+"""
+Prepare the output for the `--dry-run` option, which makes the program
+load the configuration and display the values that WOULD be used if the
+program were executed normally.
+"""
 
-from .bios import (get_discord_task, get_github_task, get_instagram_task,
-                   get_spotify_tasks, load_json)
+from datetime import date
+from typing import Any, Literal
+
+import rich.box
+import rich.traceback
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
+
+from .bios import (LoadedDict, get_discord_task, get_github_task,
+                   get_instagram_task, get_spotify_tasks, load_json)
+from .config import JSON_FILE_PATH
+from .logger import get_last_success_timestamp
+
+DISABLED_TEXT = Text("✗ DISABLED", style="red")
+ENABLED_TEXT = Text("✓ ENABLED", style="green")
+UNCHANGED_TEXT = Text("<unchanged>", style="black")
 
 
-def get_config_output() -> str:
-    """Return output for the option of just reading the config file."""
-    data = load_json()
-    lines: list[str] = []
+def format_task(
+    platform: Literal["DISCORD", "INSTAGRAM", "GITHUB"],
+    data: LoadedDict,
+) -> Table:
+    task: str | None
+    color: str
+    match platform:
+        case "DISCORD":
+            task = get_discord_task(data)
+            color = "blue"
+        case "INSTAGRAM":
+            task = get_instagram_task(data)
+            color = "bright_magenta"
+        case "GITHUB":
+            task = get_github_task(data)
+            color = "white"
 
-    discord_task = get_discord_task(data)
-    instagram_task = get_instagram_task(data)
-    spotify_tasks = get_spotify_tasks(data)
-    github_task = get_github_task(data)
+    table = Table(
+        title=Text(platform, style=color),
+        style=color,
+    )
+    # Make the enabled/disabled text appear as a "header".
+    table.add_column("", justify="right")
+    if task is None:
+        table.add_column(DISABLED_TEXT)
+        table.add_row("bio", Text("(config was `null`)", style="black"))
+    else:
+        table.add_column(ENABLED_TEXT)
+        table.add_row("bio", task)
+    return table
 
-    DISABLED_TEXT = f"{Fore.RED}Disabled{Fore.RESET}"
-    ENABLED_TEXT = f"{Fore.GREEN}Enabled{Fore.RESET}"
-    UNCHANGED_TEXT = f"{Fore.BLACK}<unchanged>{Fore.RESET}"
 
-    # TODO: Maybe make each of Discord, Instagram, etc. into its own
-    # class to somehow separate this kind of formmating to their own
-    # implementation of choice.
-    for platform, task in zip(("DISCORD", "INSTAGRAM", "GITHUB"),
-                              (discord_task, instagram_task, github_task)):
-        if task is None:
-            lines.append(f"❌ {platform}: {DISABLED_TEXT}\n"
-                         f"{Fore.BLACK}(config was `null`){Fore.RESET}")
-        else:
-            segment = (
-                f"✅ {platform}: {ENABLED_TEXT}\n"
-                f"bio={Fore.YELLOW}{task!r}{Fore.RESET}"
-            )
-            lines.append(segment)
-    result = "\n\n".join(lines)
-
-    if len(spotify_tasks) == 0:
-        result += f"\n\n❌ SPOTIFY: {DISABLED_TEXT} (config was `[]`)"
-        return result
-
-    lines: list[str] = []
-    for task in spotify_tasks:
+def format_spotify_tasks(data: LoadedDict) -> list[Table]:
+    def format_spotify_task(task: dict[str, Any]) -> Table:
         playlist_id = task["playlist_id"]
         comment = task["comment"]
         if task["name"]:
-            name = f"{Fore.YELLOW}{task['name']!r}{Fore.RESET}"
+            name = task['name']
         else:
             name = UNCHANGED_TEXT
         if task["description"]:
-            description = f"{Fore.YELLOW}{task['description']!r}{Fore.RESET}"
+            description = task['description']
         else:
             description = UNCHANGED_TEXT
-        segment = (
-            f"✅ SPOTIFY: {ENABLED_TEXT} ({comment or '?'})\n"
-            f"id={Fore.BLACK}{playlist_id}{Fore.RESET}\n"
-            f"name={name}\n"
-            f"description={description}"
+
+        table = Table(
+            title=Text("SPOTIFY", style="green"),
+            style="green",
         )
-        lines.append(segment)
-    result += "\n\n" + "\n\n".join(lines)
-    return result
+        # Make the enabled/disabled text appear as a "header".
+        table.add_column("", justify="right")
+        table.add_column(ENABLED_TEXT)
+
+        table.add_row("id", Text(playlist_id, style="black"))
+        table.add_row("comment", comment or "?")
+        table.add_row("name", name)
+        table.add_row("description", description)
+
+        return table
+
+    spotify_tasks = get_spotify_tasks(data)
+    tables = [format_spotify_task(task) for task in spotify_tasks]
+
+    # Prepare a single special "DISABLED" table.
+    if len(tables) == 0:
+        table = Table(
+            title=Text("SPOTIFY", style="green"),
+            style="green"
+        )
+        # Make the enabled/disabled text appear as a "header".
+        table.add_column("", justify="right")
+        table.add_column(DISABLED_TEXT)
+        table.add_row("", Text("(config was `[]`)", style="black"))
+        tables = [table]
+
+    return tables
+
+
+def print_dry_run() -> None:
+    """Return output for the option of just reading the config file."""
+    console = Console()
+    rich.traceback.install(console=console)
+
+    data = load_json()
+
+    console.print(
+        "\nThe values that will be used upon running this program "
+        f"today {date.today()}, as loaded from {JSON_FILE_PATH}:\n"
+    )
+
+    for platform in ("DISCORD", "INSTAGRAM", "GITHUB"):
+        table = format_task(platform, data)
+        console.print(table)
+
+    tables = format_spotify_tasks(data)
+    for table in tables:
+        console.print(table)
+
+    console.print("\nTo execute, drop the `--dry-run` flag.")
+    timestamp = get_last_success_timestamp()
+    if timestamp is not None:
+        console.print(f"[black]Last successful run at {timestamp}.[/]\n")

@@ -4,16 +4,11 @@ Entry point.
 """
 
 import sys
-from datetime import date
-
-from colorama import Fore
 
 from . import parse_args, run_program
-from .config import JSON_FILE_PATH
-from .dry_run import get_config_output
+from .dry_run import print_dry_run
 from .emailer import send_email
-from .logger import (TaskFailure, format_content, get_last_success_timestamp,
-                     log_report, logging)
+from .logger import TaskFailure, format_content, log_report, logging
 
 # Parse and unpack debugging options
 ns = parse_args()
@@ -29,18 +24,7 @@ if console_only:
     logging.disable(100)
 
 if dry_run:
-    output_lines = get_config_output().splitlines()
-    # Indent between the header and footer for a cooler effect I guess
-    output_lines = [f"    {line}" for line in output_lines]
-    print(
-        "\nThe values that will be used upon running this program "
-        f"today {date.today()}, as loaded from {JSON_FILE_PATH}:\n"
-    )
-    print("\n".join(output_lines))
-    print("\nTo execute, drop the `--dry-run` flag.")
-    timestamp = get_last_success_timestamp()
-    if timestamp is not None:
-        print(f"{Fore.BLACK}Last successful run at {timestamp}.{Fore.RESET}\n")
+    print_dry_run()
     sys.exit(0)
 
 # Run program
