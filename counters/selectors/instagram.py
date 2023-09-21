@@ -24,7 +24,7 @@ xpath.
 BIO_BOX = "#pepBio"
 """Input text area for updating the user bio."""
 
-XPATH_SUBMIT_BUTTON = "/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[3]/div/form/div[5]/div/div/div"
+SUBMIT_BUTTON = "._ab47"
 """Submit button on the "Edit profile" page."""
 
 XPATH_PROFILE_SAVED = "/html/body/div[3]/div[1]/div/div/div/p"

@@ -12,8 +12,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME
 from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
-                                   USERNAME_INPUT, XPATH_NOT_NOW_BUTTON,
-                                   XPATH_SUBMIT_BUTTON)
+                                   SUBMIT_BUTTON, USERNAME_INPUT,
+                                   XPATH_NOT_NOW_BUTTON)
 
 
 def _login(driver: webdriver.Edge) -> None:
@@ -72,7 +72,7 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     bio_box.send_keys(bio)
 
     # NOTE: If you don't edit anything, the button will be disabled
-    submit_button = driver.find_element(By.XPATH, XPATH_SUBMIT_BUTTON)
+    submit_button = driver.find_element(By.CSS_SELECTOR, SUBMIT_BUTTON)
     submit_button.click()
 
     # Make sure the update registered
