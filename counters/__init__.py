@@ -156,7 +156,7 @@ def run_program(fails: TaskFailure,
     if github:
         try:
             github_bio = get_github_task(data)
-            update_profile_bio(driver, github_bio)
+            update_profile_bio(github_bio)
             print("Updated GitHub bio.")
         except Exception as e:
             print("FAILED to update GitHub bio.")
