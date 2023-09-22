@@ -4,7 +4,8 @@ Expose the main process to run as a function.
 """
 
 import sys
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, ArgumentTypeError, Namespace
+from datetime import date, datetime
 
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
@@ -55,8 +56,18 @@ def parse_args() -> Namespace:
     parser.add_argument("-i", "--instagram", action="store_true")
     parser.add_argument("-s", "--spotify", action="store_true")
     parser.add_argument("-g", "--github", action="store_true")
+
+    def valid_iso_date(value: str) -> date:
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            raise ArgumentTypeError(
+                f"{value!r} is not a valid ISO date"
+            ) from None
+
     # Read configuration file and output what would be run
-    parser.add_argument("-n", "--dry-run", action="store_true")
+    parser.add_argument("-n", "--dry-run", nargs="?",
+                        type=valid_iso_date, const=date.today())
     ns = parser.parse_args(sys.argv[1:])
 
     # Argument postprocessing:

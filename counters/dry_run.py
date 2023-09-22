@@ -29,18 +29,19 @@ UNCHANGED_TEXT = Text("<unchanged>", style=Style(color="black"))
 def format_task(
     platform: Literal["DISCORD", "INSTAGRAM", "GITHUB"],
     data: LoadedDict,
+    today: date,
 ) -> Panel:
     task: str | None
     color: str
     match platform:
         case "DISCORD":
-            task = get_discord_task(data)
+            task = get_discord_task(data, today)
             color = "blue"
         case "INSTAGRAM":
-            task = get_instagram_task(data)
+            task = get_instagram_task(data, today)
             color = "bright_magenta"
         case "GITHUB":
-            task = get_github_task(data)
+            task = get_github_task(data, today)
             color = "white"
 
     header = (DISABLED_TEXT if task is None else ENABLED_TEXT).copy()
@@ -61,7 +62,7 @@ def format_task(
     )
 
 
-def format_spotify_tasks(data: LoadedDict) -> list[Panel]:
+def format_spotify_tasks(data: LoadedDict, today: date) -> list[Panel]:
     def format_spotify_task(task: dict[str, Any]) -> Panel:
         playlist_id = task["playlist_id"]
         comment = Text(task["comment"])
@@ -93,7 +94,7 @@ def format_spotify_tasks(data: LoadedDict) -> list[Panel]:
             expand=True,
         )
 
-    spotify_tasks = get_spotify_tasks(data)
+    spotify_tasks = get_spotify_tasks(data, today)
     panels = [format_spotify_task(task) for task in spotify_tasks]
 
     # Prepare a single special "DISABLED" panel.
@@ -113,7 +114,7 @@ def format_spotify_tasks(data: LoadedDict) -> list[Panel]:
     return panels
 
 
-def print_dry_run() -> None:
+def print_dry_run(simulation_date: date) -> None:
     """Return output for the option of just reading the config file."""
     console = Console()
     rich.traceback.install(console=console)
@@ -121,8 +122,8 @@ def print_dry_run() -> None:
     data = load_json()
 
     header = Panel(
-        "The values that will be used upon running this program "
-        f"today [bold]{date.today()}[/], as loaded from {JSON_FILE_PATH}:",
+        "The values that will be used upon running this program on "
+        f"[bold]{simulation_date}[/], as loaded from {JSON_FILE_PATH}:",
         style="cyan",
         expand=True,
     )
@@ -131,10 +132,10 @@ def print_dry_run() -> None:
     columns: tuple[list[Panel], list[Panel]] = ([], [])
 
     for platform in ("DISCORD", "INSTAGRAM", "GITHUB"):
-        panel = format_task(platform, data)
+        panel = format_task(platform, data, simulation_date)
         columns[0].append(panel)
 
-    panels = format_spotify_tasks(data)
+    panels = format_spotify_tasks(data, simulation_date)
     for panel in panels:
         columns[1].append(panel)
 

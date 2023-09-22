@@ -4,6 +4,7 @@ Entry point.
 """
 
 import sys
+from datetime import date
 
 from . import parse_args, run_program
 from .dry_run import print_dry_run
@@ -18,13 +19,13 @@ d: bool = ns.discord
 i: bool = ns.instagram
 s: bool = ns.spotify
 g: bool = ns.github
-dry_run: bool = ns.dry_run
+dry_run_date: date | None = ns.dry_run
 
 if console_only:
     logging.disable(100)
 
-if dry_run:
-    print_dry_run()
+if dry_run_date is not None:
+    print_dry_run(dry_run_date)
     sys.exit(0)
 
 # Run program

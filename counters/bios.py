@@ -13,17 +13,22 @@ import jsonschema
 from .config import DATE_FORMAT, JSON_FILE_PATH, JSON_SCHEMA_PATH
 
 
-def day_number(start: date) -> int:
-    """Calculate the day number of today relative to a starting date.
+def day_number(start: date, today: date | None = None) -> int:
+    """
+    Calculate the day number of a date (default today) relative to a
+    starting date.
 
     Args:
         start (date): The date considered to be "Day 1."
+        today: (date | None, optional): The date to consider "today".
+        Defaults to today.
 
     Returns:
         int: Day number since the starting date.
     """
+    today = today or date.today()
     # +1 to start at Day 1
-    return (date.today() - start).days + 1
+    return (today - start).days + 1
 
 
 def _convert_start_date(d: dict[str, str | None]) -> None:
@@ -96,12 +101,17 @@ def load_json() -> LoadedDict:
     return data
 
 
-def get_discord_task(data: LoadedDict) -> str | None:
+def get_discord_task(
+    data: LoadedDict,
+    today: date | None = None,
+) -> str | None:
     """Prepare the "status" argument to pass to update_status().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
         central JSON file.
+        today: (date | None, optional): The date to consider "today".
+        Defaults to today.
 
     Returns:
         str | None: The instantiated status template to pass to
@@ -114,17 +124,22 @@ def get_discord_task(data: LoadedDict) -> str | None:
     start: date | None = task["start"]
     status: str | None = task["status"]
     if start is not None and status is not None:
-        status = status.format(day_number(start))
+        status = status.format(day_number(start, today))
 
     return status
 
 
-def get_instagram_task(data: LoadedDict) -> str | None:
+def get_instagram_task(
+    data: LoadedDict,
+    today: date | None = None,
+) -> str | None:
     """Prepare the "bio" argument to pass to update_bio().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
         central JSON file.
+        today: (date | None, optional): The date to consider "today".
+        Defaults to today.
 
     Returns:
         str | None: The instantiated bio template to pass to
@@ -137,17 +152,22 @@ def get_instagram_task(data: LoadedDict) -> str | None:
     start: date | None = task["start"]
     bio: str | None = task["bio"]
     if start is not None and bio is not None:
-        bio = bio.format(day_number(start))
+        bio = bio.format(day_number(start, today))
 
     return bio
 
 
-def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
+def get_spotify_tasks(
+    data: LoadedDict,
+    today: date | None = None,
+) -> list[dict[str, str | None]]:
     """Prepare the keyword arguments to pass to update_playlist().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
         central JSON file.
+        today: (date | None, optional): The date to consider "today".
+        Defaults to today.
 
     Returns:
         list[dict[str, str | None]]: A list of entries, each of which
@@ -166,9 +186,9 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
         comment: str | None = task["comment"]
         if start is not None:
             if name is not None:
-                name = name.format(day_number(start))
+                name = name.format(day_number(start, today))
             if description is not None:
-                description = description.format(day_number(start))
+                description = description.format(day_number(start, today))
 
         # Prepare the kwargs for this task
         kwargs = {
@@ -182,12 +202,17 @@ def get_spotify_tasks(data: LoadedDict) -> list[dict[str, str | None]]:
     return result
 
 
-def get_github_task(data: LoadedDict) -> str | None:
+def get_github_task(
+    data: LoadedDict,
+    today: date | None = None,
+) -> str | None:
     """Prepare the "bio" argument to pass to update_profile_bio().
 
     Args:
         data (LoadedDict): The loaded and configured data from the
         central JSON file.
+        today: (date | None, optional): The date to consider "today".
+        Defaults to today.
 
     Returns:
         str | None: The instantiated bio template to pass to
@@ -200,6 +225,6 @@ def get_github_task(data: LoadedDict) -> str | None:
     start: date | None = task["start"]
     bio: str | None = task["bio"]
     if start is not None and bio is not None:
-        bio = bio.format(day_number(start))
+        bio = bio.format(day_number(start, today))
 
     return bio
