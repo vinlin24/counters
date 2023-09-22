@@ -88,11 +88,24 @@ the templates is edit the [bios.json file](#configuration-bio-templates).
 But for debugging/development purposes, the code can be [run on demand](#demo)
 with some command line options:
 
-```powershell
-cd path\to\this\repo
-.venv\Scripts\Activate.ps1
-python -m counters <# options #>
+```sh
+poetry run counters [options]
 ```
+
+This project uses [Poetry](https://python-poetry.org/) for dependency
+management. If the above command doesn't work, you probably have not set it up
+yet:
+
+```sh
+pip install poetry
+poetry install
+```
+
+
+### Options Reference
+
+You can also use the `--help` flag for the most up-to-date information directly
+at the command line.
 
 | Option           | Description                                                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

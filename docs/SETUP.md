@@ -17,9 +17,9 @@ When running the task, use the following user account: (my `$env:USERNAME`)
 
 ### Actions
 
-| Action          | Program/script                              | Arguments   | Start in          |
-| --------------- | ------------------------------------------- | ----------- | ----------------- |
-| Start a program | path\to\this\repo\\.venv\Scripts\python.exe | -m counters | path\to\this\repo |
+| Action          | Program/script | Arguments    | Start in          |
+| --------------- | -------------- | ------------ | ----------------- |
+| Start a program | path\to\poetry | run counters | path\to\this\repo |
 
 ### Conditions
 
