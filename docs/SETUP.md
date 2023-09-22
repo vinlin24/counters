@@ -28,7 +28,10 @@ When running the task, use the following user account: (my `$env:USERNAME`)
 ### Settings
 
 - [x] Allow task to be run on demand
+- [x] Run task as soon as possible after a scheduled start is missed
+- [x] If the task fails, restart every: 1 minute
+  - Attempt to restart up to: 3 times
 - [x] Stop the task if it runs longer than: 1 hour
 - [x] If the running task does not end when requested, force it to stop
 
-If tha task is already running, then the following rule applies: Do not start a new instance
+If the task is already running, then the following rule applies: Do not start a new instance
