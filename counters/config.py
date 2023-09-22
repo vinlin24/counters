@@ -17,7 +17,7 @@ dotenv.load_dotenv(override=True)
 JSON_FILE_PATH = Path.home() / ".config" / "counters" / "bios.json"
 """Absolute path to the central JSON file containing status templates."""
 
-JSON_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "bios.schema.json"
+JSON_SCHEMA_PATH = Path(__file__).parent / "schema" / "bios.schema.json"
 """Absolute path to the schema for the central JSON file."""
 
 DATE_FORMAT = "%Y-%m-%d"

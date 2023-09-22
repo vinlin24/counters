@@ -31,12 +31,11 @@ If it's missing, you should make one at this path. A log file is also maintained
 in this directory.
 
 As of now, the `bios.json` file should conform to the provided schema,
-[`bios.schema.json`](schema/bios.schema.json). This is what my file looks like
-at the time of writing this:
+[`bios.schema.json`](counters/schema/bios.schema.json). This is an example file:
 
 ```json
 {
-  "$schema": "../../repos/counters/schema/bios.schema.json",
+  "$schema": "../../repos/counters/counters/schema/bios.schema.json",
   "discord": {
     "status": "day {0} of waiting for HSSEAS to let me in",
     "start": "2022-09-26"
