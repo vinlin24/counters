@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "counters"
+version = "0.0.0"
+description = "Automating \"Day X of...\" on my social media statuses"
+authors = ["Vincent Lin <vinlin24@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jsonschema = "^4.19.1"
+PyGithub = "^1.59.1"
+rich = "^13.5.3"
+selenium = "^4.12.0"
+tekore = "^5.0.1"
+webdriver-manager = "^4.0.0"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.4"
+pylint = "^2.17.5"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
