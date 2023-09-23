@@ -7,10 +7,11 @@ https://docs.python.org/3/library/email.examples.html
 """
 
 import smtplib
-from datetime import date
+import sys
+from datetime import date, datetime
 from email.message import EmailMessage
 
-from .config import ERROR_EMAIL, ERROR_EMAIL_PASSWORD
+from .config import ERROR_EMAIL, ERROR_EMAIL_PASSWORD, LOG_FILE_PATH
 
 
 def send_email(content: str | None) -> None:
@@ -39,9 +40,16 @@ def send_email(content: str | None) -> None:
     # Send email to self through Outlook server
     # https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html
     host, port = "smtp-mail.outlook.com", 587
-    with smtplib.SMTP(host, port) as smtp:
-        smtp.starttls()
-        smtp.login(user=ERROR_EMAIL, password=ERROR_EMAIL_PASSWORD)
-        smtp.send_message(message)
-
-    print("Email sent successfully.")
+    try:
+        with smtplib.SMTP(host, port) as smtp:
+            smtp.starttls()
+            smtp.login(user=ERROR_EMAIL, password=ERROR_EMAIL_PASSWORD)
+            smtp.send_message(message)
+    except smtplib.SMTPException as exc:
+        message = f"Failed to send email: {exc}"
+        sys.stderr.write(message)
+        entry = f"[{datetime.now()}] {message}\n"
+        with LOG_FILE_PATH.open("at", encoding="utf-8") as log:
+            log.write(entry)
+    else:
+        print("Email sent successfully.")
