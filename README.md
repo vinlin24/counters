@@ -140,6 +140,8 @@ at the command line.
 
 ## Demo
 
+<!-- TODO: Video demo is kind of outdated -->
+
 Here's a screen recording of this program at work. I included the `--window` and
 `--console` flags for demonstration purposes only. The scheduled task runs the
 package without any [command line arguments](#usage-running-on-demand), so it
@@ -156,6 +158,14 @@ And here's a snapshot of the overview of the Task Scheduler task I set up. The
 full details can be found [here](docs/SETUP.md).
 
 ![Task Scheduler Overview](demo/task-scheduler-overview.png)
+
+<!-- END TODO -->
+
+Example `--dry-run` output, which uses the
+[rich](https://rich.readthedocs.io/en/stable/introduction.html) library for
+pretty console formatting:
+
+![Dry Run Output](demo/dry-run-output.png)
 
 
 ## Development: Environment Recovery
