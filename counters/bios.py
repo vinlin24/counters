@@ -183,7 +183,7 @@ def get_spotify_tasks(
         name: str | None = task["name"]
         description: str | None = task["description"]
         start: date | None = task["start"]
-        comment: str | None = task["comment"]
+        comment: str | None = task.get("comment")
         if start is not None:
             if name is not None:
                 name = name.format(day_number(start, today))

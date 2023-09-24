@@ -65,7 +65,7 @@ def format_task(
 def format_spotify_tasks(data: LoadedDict, today: date) -> list[Panel]:
     def format_spotify_task(task: dict[str, Any]) -> Panel:
         playlist_id = task["playlist_id"]
-        comment = Text(task["comment"])
+        comment = Text(task.get("comment") or "?")
         if task["name"]:
             name = Text(task["name"])
         else:
@@ -82,7 +82,7 @@ def format_spotify_tasks(data: LoadedDict, today: date) -> list[Panel]:
         table.add_column("", style="reset", justify="right")
         table.add_column("", style="reset")
         table.add_row("id", Text(playlist_id, style="black"))
-        table.add_row("comment", comment or "?")
+        table.add_row("comment", comment)
         table.add_row("name", name)
         table.add_row("description", description)
 
