@@ -1,9 +1,16 @@
 # Status Day Counters
 
-> :mega: This README is mostly for future me if I decide to come back and
+<!-- > :mega: This README is mostly for future me if I decide to come back and
 > review/enhance this project. If by any chance you are a stray visitor, you're
 > welcome to use this code and instructions to mess around with your social
-> media accounts too.
+> media accounts too. -->
+
+A Python program for automating writing "Day X of..." on my social media bios.
+It reads from a central configuration file and proceeds to either interact with
+official APIs (Spotify, GitHub) or fall back to using
+[Selenium](https://selenium-python.readthedocs.io/index.html) to manually scrape
+the web application and make the changes (Discord, Instagram).
+
 
 ## Description: Motivation
 
@@ -21,14 +28,17 @@ The original standalone scripts are included in the [standalones](standalones)
 directory just for record. I am 100% sure they do not work anymore.
 -->
 
+
 ## Configuration: Bio Templates
 
 I placed the configuration file at:
-```powershell
-"$env:USERPROFILE\.config\counters\bios.json"
+
+```sh
+~/.config/counters/bios.json
 ```
-If it's missing, you should make one at this path. A log file is also maintained
-in this directory.
+
+If it's missing, you should make one at this path. A log file `counters.log` is
+also maintained in this directory.
 
 As of now, the `bios.json` file should conform to the provided schema,
 [`bios.schema.json`](counters/schema/bios.schema.json). This is an example file:
@@ -46,9 +56,9 @@ As of now, the `bios.json` file should conform to the provided schema,
   },
   "spotify": [
     {
-      "comment": "coding grind HSSEAS counter",
+      "comment": "main playlist",
       "playlist_id": "5FpuSaX0kDeItlPMIIYBZS",
-      "name": null,
+      "name": "day 0x{0:02X}",
       "description": "day {0} of waiting for HSSEAS to let me in",
       "start": "2022-09-26"
     },
@@ -61,22 +71,32 @@ As of now, the `bios.json` file should conform to the provided schema,
     }
   ],
   "github": {
-    "bio": "UCLA '24. Day {0} of waiting for HSSEAS to let me in.",
-    "start": "2022-09-26"
+    "bio": "UCLA CS '24 // T{0} days!",
+    "start": "2024-06-15"
   }
 }
 ```
 
 Notes:
 
-- The strings to display (`status`, `bio`, `description`) can include, but don't
-  need to, a `{0}` placeholder for where the day number will go.
-- The `start` keys are dates to be considered as "Day 1" in the count.
-- For each Spotify playlist entry, you have the option to change either the
+* The strings to display (`status`, `bio`, `description`) can include, but don't
+  need to, a `{0}` placeholder for where the day number will go. At the moment,
+  the
+  [`str.format()`](https://docs.python.org/3/library/stdtypes.html#str.format)
+  is applied directly on the template string, meaning you can use format codes
+  the same was you would do in Python code.
+  * In the above example, I use `"day 0x{0:02X}"` to format the number in
+    zero-padded hexadecimal e.g. `day 0x0C`.
+* The `start` keys are dates to be considered as "Day 1" in the count.
+  * You can also use *future* dates to implement **countdowns**. Negative counts
+    are returned as they are. In the GitHub example above, I use this trick
+    to write things like `T-265 days!`.
+* For each Spotify playlist entry, you have the option to change either the
   playlist name, description, or both. Leaving a key as `null` signifies leaving
   it unchanged.
-- The `comment` keys are not used nor are they required by the schema. They're
+* The `comment` keys are not used nor are they required by the schema. They're
   just a way to document each playlist entry for yourself.
+
 
 ## Usage: Running on Demand
 
@@ -117,6 +137,7 @@ at the command line.
 | `-g/--github`    | If any of these 4 switches are included, run these select tasks. Otherwise if all 4 switches are absent from the command line, use the default behavior of running all. |
 | `-n/--dry-run`   | Just load the configuration settings and output the values the program *would* run with.                                                                                |
 
+
 ## Demo
 
 Here's a screen recording of this program at work. I included the `--window` and
@@ -136,9 +157,11 @@ full details can be found [here](docs/SETUP.md).
 
 ![Task Scheduler Overview](demo/task-scheduler-overview.png)
 
+
 ## Development: Environment Recovery
 
 See [DEVELOPMENT.md](docs/DEVELOPMENT.md#environment-recovery).
+
 
 ## Development: Implementation Details
 
