@@ -42,6 +42,9 @@ def main() -> None:
     else:
         fails.print_tracebacks()
 
+    # So the scheduler conveys the failure too.
+    sys.exit(0 if fails.all_good() else 1)
+
 
 if __name__ == "__main__":
     main()
