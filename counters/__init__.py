@@ -114,13 +114,13 @@ def run_program(fails: TaskFailure,
         options.headless = not windowed
         # Headless option by default causes window to be tiny, which interferes
         # with finding elements if it's rendered responsively
-        options.add_argument("--window-size=1920,1080")
         # print(f"Using profile at {PROFILE_PATH}")
         # options.add_argument(f"user-data-dir={PROFILE_PATH}")
         # print(f"Using User-Agent={USER_AGENT}")
         # options.add_argument(f"user-agent={USER_AGENT}")
         driver = webdriver.Edge(service=service, options=options)
         driver.implicitly_wait(WAIT_TIMEOUT)
+        driver.maximize_window()
         print("Driver initialized.")
     except Exception as e:
         print("FAILED to initialize driver.")
