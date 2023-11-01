@@ -121,7 +121,8 @@ def run_program(fails: TaskFailure,
             driver_path = str(path)
         service = Service(executable_path=driver_path)
         options = Options()
-        options.headless = not windowed
+        if not windowed:
+            options.add_argument("--headless")
         # Headless option by default causes window to be tiny, which interferes
         # with finding elements if it's rendered responsively
         # print(f"Using profile at {PROFILE_PATH}")
