@@ -6,6 +6,7 @@ Expose the main process to run as a function.
 import sys
 from argparse import ArgumentParser, ArgumentTypeError, Namespace
 from datetime import date, datetime
+from pathlib import Path
 
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
@@ -31,6 +32,7 @@ def parse_args() -> Namespace:
         and don't email.
         - window (bool): Have Selenium run with a browser window
         instead of headlessly
+        - path (Path): Custom path to web driver executable to use.
         - discord (bool): See below.
         - instagram (bool): See below.
         - spotify (bool): See below.
@@ -51,6 +53,8 @@ def parse_args() -> Namespace:
     parser.add_argument("-c", "--console", action="store_true")
     # Run with a browser window instead of headlessly
     parser.add_argument("-w", "--window", action="store_true")
+    # Manually specify the web driver executable
+    parser.add_argument("-p", "--path", type=Path)
     # If any of these are included, run those select tasks instead of all
     parser.add_argument("-d", "--discord", action="store_true")
     parser.add_argument("-i", "--instagram", action="store_true")
@@ -81,6 +85,7 @@ def parse_args() -> Namespace:
 
 def run_program(fails: TaskFailure,
                 windowed: bool,
+                path: Path | None,
                 discord: bool,
                 instagram: bool,
                 spotify: bool,
@@ -93,6 +98,7 @@ def run_program(fails: TaskFailure,
         any, for individual tasks within this function.
         windowed (bool): Whether to run the driver with a browser
         window instead of headlessly.
+        path (Path | None): Path to web driver executable, if specified.
         discord (bool): Whether to run the Discord task.
         instagram (bool): Whether to run the Instagram task.
         spotify (bool): Whether to run the Spotify tasks.
@@ -109,7 +115,11 @@ def run_program(fails: TaskFailure,
 
     # Initialize Edge driver
     try:
-        service = Service(EdgeChromiumDriverManager().install())
+        if path is None:
+            driver_path = EdgeChromiumDriverManager().install()
+        else:
+            driver_path = str(path)
+        service = Service(executable_path=driver_path)
         options = Options()
         options.headless = not windowed
         # Headless option by default causes window to be tiny, which interferes

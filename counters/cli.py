@@ -5,6 +5,7 @@ Defines the entry point for the Poetry script.
 
 import sys
 from datetime import date
+from pathlib import Path
 
 from . import parse_args, run_program
 from .dry_run import print_dry_run
@@ -17,6 +18,7 @@ def main() -> None:
     ns = parse_args()
     console_only: bool = ns.console
     windowed: bool = ns.window
+    path: Path | None = ns.path
     d: bool = ns.discord
     i: bool = ns.instagram
     s: bool = ns.spotify
@@ -32,7 +34,7 @@ def main() -> None:
 
     # Run program
     fails = TaskFailure()
-    run_program(fails, windowed, d, i, s, g)
+    run_program(fails, windowed, path, d, i, s, g)
 
     # Log and send failure report is there was any error
     if not console_only:
