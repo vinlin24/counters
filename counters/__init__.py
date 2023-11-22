@@ -26,7 +26,7 @@ def parse_args() -> Namespace:
     """Parse and process command line options for debugging.
 
     Returns:
-        Namespace: Object with 5 fields:
+        Namespace: Object with 6 fields:
 
         - console (bool): Output to console only, don't touch log file
         and don't email.
@@ -39,6 +39,8 @@ def parse_args() -> Namespace:
         - github (bool): If any of these 4 switches are included, run
         these select tasks. Otherwise if all 4 switches are absent from
         the command line, use the default behavior of running all.
+        - dry_run (bool): Whether the program should just output the
+        values that would be used instead of actually running.
 
     Postcondition:
         The values of these switches are not necessarily the same as
@@ -47,19 +49,49 @@ def parse_args() -> Namespace:
         setting discord = instagram = spotify = github = True when all
         4 are absent from the command line.
     """
-    parser = ArgumentParser(description="Manually run counters program")
+    parser = ArgumentParser(
+        description="Manually run counters program",
+    )
 
     # Output to console only, don't touch log file and don't email
-    parser.add_argument("-c", "--console", action="store_true")
+    parser.add_argument(
+        "-c", "--console",
+        action="store_true",
+        help="output to console only, don't touch log file and don't email",
+    )
     # Run with a browser window instead of headlessly
-    parser.add_argument("-w", "--window", action="store_true")
+    parser.add_argument(
+        "-w", "--window",
+        action="store_true",
+        help="have Selenium run with a browser window instead of headlessly",
+    )
     # Manually specify the web driver executable
-    parser.add_argument("-p", "--path", type=Path)
+    parser.add_argument(
+        "-p", "--path",
+        type=Path,
+        help="custom path to web driver executable to use",
+    )
     # If any of these are included, run those select tasks instead of all
-    parser.add_argument("-d", "--discord", action="store_true")
-    parser.add_argument("-i", "--instagram", action="store_true")
-    parser.add_argument("-s", "--spotify", action="store_true")
-    parser.add_argument("-g", "--github", action="store_true")
+    parser.add_argument(
+        "-d", "--discord",
+        action="store_true",
+        help="run the Discord task (runs all tasks if such flags omitted)",
+    )
+    parser.add_argument(
+        "-i", "--instagram",
+        action="store_true",
+        help="run the Instagram task (runs all tasks if such flags omitted)",
+    )
+    parser.add_argument(
+        "-s", "--spotify",
+        action="store_true",
+        help="run the Spotify tasks (runs all tasks if such flags omitted)",
+    )
+    parser.add_argument(
+        "-g", "--github",
+        action="store_true",
+        help="run the GitHub task (runs all tasks if such flags omitted)",
+    )
 
     def valid_iso_date(value: str) -> date:
         try:
@@ -70,8 +102,13 @@ def parse_args() -> Namespace:
             ) from None
 
     # Read configuration file and output what would be run
-    parser.add_argument("-n", "--dry-run", nargs="?",
-                        type=valid_iso_date, const=date.today())
+    parser.add_argument(
+        "-n", "--dry-run",
+        nargs="?",
+        type=valid_iso_date,
+        const=date.today(),
+        help="display the values that would be used if the program were run",
+    )
     ns = parser.parse_args(sys.argv[1:])
 
     # Argument postprocessing:
