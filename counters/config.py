@@ -36,7 +36,9 @@ WAIT_TIMEOUT = 15.0
 # ==================== CREDENTIALS ==================== #
 
 DISCORD_EMAIL = os.environ["DISCORD_EMAIL"]
+"""Email address associated with my Discord account."""
 DISCORD_PASSWORD = os.environ["DISCORD_PASSWORD"]
+"""Password to my Discord account."""
 
 INSTAGRAM_USERNAME = os.environ["INSTAGRAM_USERNAME"]
 INSTAGRAM_PASSWORD = os.environ["INSTAGRAM_PASSWORD"]
