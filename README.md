@@ -11,11 +11,13 @@ official APIs (Spotify, GitHub) or fall back to using
 [Selenium](https://selenium-python.readthedocs.io/index.html) to manually scrape
 the web application and make the changes (Discord, Instagram).
 
-**UPDATE:** My other project,
-[status-logger](https://github.com/vinlin24/status-logger), has been merged into
-this codebase due to them sharing very similar code. It is available as a
-subprogram through the [`--log-discord-status` command line
-switch](#options-reference).
+> [!NOTE]
+>
+> **UPDATE:** My other project,
+> [status-logger](https://github.com/vinlin24/status-logger), has been merged
+> into this codebase due to them sharing very similar code. It is available as a
+> subprogram through the [`--log-discord-status` command line
+> switch](#options-reference).
 
 
 ## Description: Motivation
@@ -26,13 +28,8 @@ HSSEAS to let me in" in wait for the results of my application to switch to
 Computer Science.
 
 I originally had a few standalone, hard-coded scripts for Discord, Instagram,
-and Spotify. This project seeks to just bring them together and one place and
-make them configurable and extendable.
-
-<!--
-The original standalone scripts are included in the [standalones](standalones)
-directory just for record. I am 100% sure they do not work anymore.
--->
+and Spotify. This project sought to bring them together to one place and make
+them configurable and extendable.
 
 
 ## Configuration: Bio Templates
