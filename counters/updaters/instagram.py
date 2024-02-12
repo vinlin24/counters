@@ -72,7 +72,7 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
     bio_box.send_keys(bio)
 
     # NOTE: If you don't edit anything, the button will be disabled
-    submit_button = driver.find_element(By.CSS_SELECTOR, SUBMIT_BUTTON)
+    submit_button = driver.find_element(By.XPATH, SUBMIT_BUTTON)
     submit_button.click()
 
     # Make sure the update registered
