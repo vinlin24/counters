@@ -5,15 +5,14 @@ Interface for updating Instagram bio.
 
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME
-from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, PASSWORD_INPUT,
-                                   SUBMIT_BUTTON, USERNAME_INPUT,
-                                   XPATH_NOT_NOW_BUTTON)
+from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, NOT_NOW_BUTTON,
+                                   PASSWORD_INPUT, SUBMIT_BUTTON,
+                                   USERNAME_INPUT)
 
 
 def _login(driver: webdriver.Edge) -> None:
@@ -23,9 +22,9 @@ def _login(driver: webdriver.Edge) -> None:
         driver (webdriver.Edge): Edge web driver instance.
     """
     # Find elements
-    username_elem = driver.find_element(By.CSS_SELECTOR, USERNAME_INPUT)
-    password_elem = driver.find_element(By.CSS_SELECTOR, PASSWORD_INPUT)
-    login_button = driver.find_element(By.CSS_SELECTOR, LOGIN_BUTTON)
+    username_elem = driver.find_element(*USERNAME_INPUT)
+    password_elem = driver.find_element(*PASSWORD_INPUT)
+    login_button = driver.find_element(*LOGIN_BUTTON)
 
     # Input credentials and login
     username_elem.clear()
@@ -43,7 +42,7 @@ def _navigate_to_profile(driver: webdriver.Edge) -> None:
     """
     # Dismiss the "Save login info" if it appears
     condition = EC.presence_of_element_located(
-        (By.XPATH, XPATH_NOT_NOW_BUTTON)
+        (NOT_NOW_BUTTON.by, NOT_NOW_BUTTON.value)
     )
     try:
         not_now_button: WebElement = WebDriverWait(driver, 5).until(condition)
@@ -65,14 +64,14 @@ def _update_profile(driver: webdriver.Edge, bio: str) -> None:
         `WAIT_TIMEOUT` seconds.
     """
     # Find elements
-    bio_box = driver.find_element(By.CSS_SELECTOR, BIO_BOX)
+    bio_box = driver.find_element(*BIO_BOX)
 
     # Submit new bio string
     bio_box.clear()
     bio_box.send_keys(bio)
 
     # NOTE: If you don't edit anything, the button will be disabled
-    submit_button = driver.find_element(By.XPATH, SUBMIT_BUTTON)
+    submit_button = driver.find_element(*SUBMIT_BUTTON)
     submit_button.click()
 
     # Make sure the update registered
