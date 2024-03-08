@@ -12,7 +12,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Generator
 
-from .config import LOG_FILE_PATH
+from .config import (EXIT_FAILURE_GITHUB, EXIT_FAILURE_INSTAGRAM,
+                     EXIT_FAILURE_SPOTIFY, LOG_FILE_PATH)
 
 logging.basicConfig(filename=LOG_FILE_PATH,
                     filemode="at",
@@ -62,6 +63,22 @@ class TaskFailure:
                     print(_format_error(error))
             elif val:
                 print(_format_error(val))
+
+    def get_exit_code(self) -> int:
+        """
+        Return the exit code encoding the success/failure(s) of the
+        tasks.
+        """
+        result = 0
+        if self.github:
+            result |= EXIT_FAILURE_GITHUB
+        if self.instagram:
+            result |= EXIT_FAILURE_INSTAGRAM
+        if self.spotify:
+            result |= EXIT_FAILURE_SPOTIFY
+        if self.github:
+            result |= EXIT_FAILURE_GITHUB
+        return result
 
 
 def _format_error(error: Exception) -> str:

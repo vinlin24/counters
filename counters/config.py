@@ -62,3 +62,22 @@ ERROR_EMAIL_PASSWORD = os.environ["ERROR_EMAIL_PASSWORD"]
 
 # USER_AGENT = os.environ["USER_AGENT"]
 # """User-Agent string to use."""
+
+
+# ==================== EXIT CODES/BITFLAGS ==================== #
+
+# Bits:
+# 5 4 3 2   1 0
+# _ _ _ _ | _ _
+# G S I D
+# ^^^^^^^   ^^^
+#  tasks  general
+
+EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
+EXIT_FAILURE_STATUS_LOGGER = 2
+
+EXIT_FAILURE_DISCORD = 1 << 2
+EXIT_FAILURE_INSTAGRAM = 1 << 3
+EXIT_FAILURE_SPOTIFY = 1 << 4
+EXIT_FAILURE_GITHUB = 1 << 5

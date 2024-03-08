@@ -9,6 +9,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 from datetime import date, datetime
 from pathlib import Path
 
+from .config import EXIT_FAILURE_STATUS_LOGGER, EXIT_SUCCESS
 from .core import run_counters
 from .dry_run import print_dry_run
 from .emailer import send_email
@@ -108,15 +109,14 @@ def main() -> None:
 
     if dry_run_date is not None:
         print_dry_run(dry_run_date)
-        sys.exit(0)
+        sys.exit(EXIT_SUCCESS)
 
     # Run status-logger sub-program and ignore everything else.
     if log_discord_status:
-        # LEFT OFF HERE: HAVEN'T TESTED.
         success = run_status_logger(console_only=console_only,
                                     headless=not windowed,
                                     driver_path=path)
-        sys.exit(0 if success else 1)
+        sys.exit(EXIT_SUCCESS if success else EXIT_FAILURE_STATUS_LOGGER)
 
     fails = TaskFailure()
     run_counters(fails, windowed, path, d, i, s, g)
@@ -130,7 +130,7 @@ def main() -> None:
         fails.print_tracebacks()
 
     # So the scheduler conveys the failure too.
-    sys.exit(0 if fails.all_good() else 1)
+    sys.exit(fails.get_exit_code())
 
 
 if __name__ == "__main__":
