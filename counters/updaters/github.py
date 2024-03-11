@@ -3,10 +3,43 @@
 Interface for updating the GitHub profile bio.
 """
 
+from datetime import date
+from typing import TypedDict
+
 from github import Auth, Github
 
+from ..bios import day_number
 from ..config import GITHUB_PAT
+from ..updaters.base import Updater
 
+
+class GitHubDetails(TypedDict):
+    bio: str | None
+
+
+class GitHubUpdater(Updater[GitHubDetails]):
+    def prepare_details(self, today: date) -> GitHubDetails:
+        task: dict = self.data["github"]
+
+        # Fill placeholder in bio template if provided
+        start: date | None = task["start"]
+        bio: str | None = task["bio"]
+        if start is not None and bio is not None:
+            bio = bio.format(day_number(start, today))
+
+        return {"bio": bio}
+
+    def update_bio(self, details: GitHubDetails) -> None:
+        bio = details["bio"]
+        if bio is None:
+            return
+        auth = Auth.Token(GITHUB_PAT)
+        github = Github(auth=auth)
+        user = github.get_user()
+        user.edit(bio=bio)
+
+
+# TODO: Replace below when finished refactoring other modules.
 # ==================== INTERFACE FUNCTION ==================== #
 
 
