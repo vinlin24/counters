@@ -3,15 +3,78 @@
 Interface for updating Discord custom status.
 """
 
+from datetime import date
+from typing import TypedDict
+
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
+from ..bios import day_number
 from ..config import DISCORD_EMAIL, DISCORD_PASSWORD
 # Experimenting CSS selectors as an alternative to full XPaths
 # Not sure how often these will change in comparison
 from ..selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
                                  PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
+from ..updaters.base import Updater
 
+
+class DiscordDetails(TypedDict):
+    status: str | None
+
+
+class DiscordUpdater(Updater[DiscordDetails]):
+    def prepare_details(self, today: date) -> DiscordDetails:
+        task: dict = self.data["discord"]
+
+        # Fill placeholder in status template if provided.
+        start: date | None = task["start"]
+        status: str | None = task["status"]
+        if start is not None and status is not None:
+            status = status.format(day_number(start, today))
+
+        return {"status": status}
+
+    def update_bio(self, details: DiscordDetails) -> None:
+        status = details["status"]
+        if status is None:
+            return
+        self.driver.get("https://discord.com/login")
+        self._login()
+        self._update_status(status)
+
+    def _login(self) -> None:
+        # Find elements
+        email_input = self.driver.find_element(*EMAIL_INPUT)
+        password_input = self.driver.find_element(*PASSWORD_INPUT)
+
+        # Enter credentials
+        email_input.clear()
+        email_input.send_keys(DISCORD_EMAIL)
+        password_input.clear()
+        password_input.send_keys(DISCORD_PASSWORD + "\n")
+
+    def _update_status(self, status: str) -> None:
+        # Bring up menu in the bottom left corner
+        avatar_icon = self.driver.find_element(*AVATAR_ICON)
+        avatar_icon.click()
+
+        # Click the "Edit custom status" option
+        # If there's currently no status, it's "Set custom status" instead
+        try:
+            custom_status = self.driver.find_element(*EDIT_STATUS_ITEM)
+        except NoSuchElementException:
+            custom_status = self.driver.find_element(*SET_STATUS_ITEM)
+        custom_status.click()
+
+        # Get the input text bot
+        status_input = self.driver.find_element(*STATUS_INPUT)
+
+        # Enter the status into the text box
+        status_input.clear()
+        status_input.send_keys(status + "\n")
+
+
+# TODO: Replace below when finished refactoring other modules.
 # ==================== SCRAPING SUBROUTINES ==================== #
 
 
