@@ -7,10 +7,12 @@ from datetime import date
 from typing import TypedDict
 
 from github import Auth, Github
+from rich.panel import Panel
 
 from ..bios import day_number
 from ..config import GITHUB_PAT
 from ..updaters.base import Updater
+from ..utils import format_generic_task_preview
 
 
 class GitHubDetails(TypedDict):
@@ -37,6 +39,13 @@ class GitHubUpdater(Updater[GitHubDetails]):
         github = Github(auth=auth)
         user = github.get_user()
         user.edit(bio=bio)
+
+    def format_preview(self, details: GitHubDetails) -> Panel:
+        return format_generic_task_preview(
+            platform_name="GitHub",
+            body_text=details["bio"],
+            color="white",
+        )
 
 
 # TODO: Replace below when finished refactoring other modules.

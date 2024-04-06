@@ -6,6 +6,7 @@ Interface for updating Discord custom status.
 from datetime import date
 from typing import TypedDict
 
+from rich.panel import Panel
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
@@ -16,6 +17,7 @@ from ..config import DISCORD_EMAIL, DISCORD_PASSWORD
 from ..selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
                                  PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
 from ..updaters.base import Updater
+from ..utils import format_generic_task_preview
 
 
 class DiscordDetails(TypedDict):
@@ -41,6 +43,13 @@ class DiscordUpdater(Updater[DiscordDetails]):
         self.driver.get("https://discord.com/login")
         self._login()
         self._update_status(status)
+
+    def format_preview(self, details: DiscordDetails) -> Panel:
+        return format_generic_task_preview(
+            platform_name="Discord",
+            body_text=details["status"],
+            color="blue",
+        )
 
     def _login(self) -> None:
         # Find elements

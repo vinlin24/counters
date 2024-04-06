@@ -6,6 +6,7 @@ Interface for updating Instagram bio.
 from datetime import date
 from typing import TypedDict
 
+from rich.panel import Panel
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
@@ -18,6 +19,7 @@ from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, NOT_NOW_BUTTON,
                                    PASSWORD_INPUT, SUBMIT_BUTTON,
                                    USERNAME_INPUT)
 from ..updaters.base import Updater
+from ..utils import format_generic_task_preview
 
 
 class InstagramDetails(TypedDict):
@@ -44,6 +46,13 @@ class InstagramUpdater(Updater[InstagramDetails]):
         self._login()
         self._navigate_to_profile()
         self._update_profile(bio)
+
+    def format_preview(self, details: InstagramDetails) -> Panel:
+        return format_generic_task_preview(
+            platform_name="Instagram",
+            body_text=details["bio"],
+            color="bright_magenta",
+        )
 
     def _login(self) -> None:
         """Handle the authentication landing page."""

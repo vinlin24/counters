@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import Generic, TypeVar
 
+import rich.panel
 from selenium import webdriver
 
 DetailsDict = TypeVar("DetailsDict")
@@ -32,3 +33,7 @@ class Updater(ABC, Generic[DetailsDict]):
     @abstractmethod
     def update_bio(self, details: DetailsDict) -> None:
         """Update the bio (or equivalent) on social media platform."""
+
+    @abstractmethod
+    def format_preview(self, details: DetailsDict) -> rich.panel.Panel:
+        """Format the console presentation of this task."""

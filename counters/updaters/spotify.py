@@ -7,6 +7,7 @@ from datetime import date
 from typing import TypedDict
 
 import tekore
+from rich.panel import Panel
 from selenium import webdriver
 
 from ..bios import day_number
@@ -76,6 +77,9 @@ class SpotifyUpdater(Updater[SpotifyDetails]):
                 name=name,  # type: ignore
                 description=description,  # type: ignore
             )
+
+    def format_preview(self, details: SpotifyDetails) -> Panel:
+        return Panel("TODO")  # TODO: figure out the playlist stuff.
 
 
 # TODO: Replace below when finished refactoring other modules.
