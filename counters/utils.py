@@ -1,3 +1,6 @@
+import functools
+import sys
+
 from rich.console import Group, RenderableType
 from rich.panel import Panel
 from rich.style import Style, StyleType
@@ -30,3 +33,6 @@ def format_generic_task_preview(
         style=color,
         expand=True,
     )
+
+
+print_error = functools.partial(print, file=sys.stderr)

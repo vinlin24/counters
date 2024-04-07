@@ -10,10 +10,10 @@ from datetime import date, datetime
 from pathlib import Path
 
 from .config import EXIT_FAILURE_STATUS_LOGGER, EXIT_SUCCESS, ProgramOptions
-from .core import run_counters
+from .core import CountersProgram
 from .dry_run import print_dry_run
 from .emailer import send_email
-from .logger import TaskFailure, format_content, log_report
+from .logger import FailureLog
 from .status_logger.core import run_status_logger
 
 
@@ -118,6 +118,7 @@ def main() -> None:
         logging.disable(100)
 
     if options.dry_run_date is not None:
+        # TODO: refactor this into a class too?
         print_dry_run(options.dry_run_date)
         sys.exit(EXIT_SUCCESS)
 
@@ -128,33 +129,22 @@ def main() -> None:
                                     driver_path=options.driver_path)
         sys.exit(EXIT_SUCCESS if success else EXIT_FAILURE_STATUS_LOGGER)
 
-    fails = TaskFailure()
-    run_counters(
-        fails,
-        options.windowed,
-        options.driver_path,
-        options.run_discord,
-        options.run_instagram,
-        options.run_spotify,
-        options.run_github,
-    )
+    # run the main program.
+    failure_log = FailureLog()
+    counters = CountersProgram(options, failure_log)
+    counters.run()
 
-    # Log and send failure report is there was any error
+    # Log and send failure report is there was any error. TODO: merge
+    # this into the CountersProgram class?
     if not options.console_only:
-        report = format_content(
-            fails,
-            options.run_discord,
-            options.run_instagram,
-            options.run_spotify,
-            options.run_github,
-        )
-        log_report(report)
+        report = failure_log.generate_report()
+        failure_log.write_report_to_file(report)
         send_email(report)
     else:
-        fails.print_tracebacks()
+        failure_log.print_tracebacks()
 
     # So the scheduler conveys the failure too.
-    sys.exit(fails.get_exit_code())
+    sys.exit(failure_log.get_exit_code())
 
 
 if __name__ == "__main__":

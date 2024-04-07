@@ -1,119 +1,132 @@
-from pathlib import Path
+# pylint: disable=broad-exception-caught
+
+from datetime import date
 
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-# TODO: Somehow combine the get_* and update_* functions to not clutter
-from .bios import (get_discord_task, get_github_task, get_instagram_task,
-                   get_spotify_tasks, load_json)
-from .config import WAIT_TIMEOUT
-from .logger import TaskFailure
-from .updaters import (update_bio, update_playlist, update_profile_bio,
-                       update_status)
+from .config import JSON_FILE_PATH, WAIT_TIMEOUT, ProgramOptions
+from .loader import load_bio_config_json
+from .logger import FailureLog
+from .updaters.base import Updater
+from .updaters.discord import DiscordUpdater
+from .updaters.github import GitHubUpdater
+from .updaters.instagram import InstagramUpdater
+from .updaters.spotify import SpotifyPlaylistUpdater
+from .utils import print_error
 
 
-def run_counters(fails: TaskFailure,
-                 windowed: bool,
-                 path: Path | None,
-                 discord: bool,
-                 instagram: bool,
-                 spotify: bool,
-                 github: bool,
-                 ) -> None:
-    """Run the main process.
-
-    Args:
-        fails (TaskFailure): Dataclass whose fields record errors, if
-        any, for individual tasks within this function.
-        windowed (bool): Whether to run the driver with a browser
-        window instead of headlessly.
-        path (Path | None): Path to web driver executable, if specified.
-        discord (bool): Whether to run the Discord task.
-        instagram (bool): Whether to run the Instagram task.
-        spotify (bool): Whether to run the Spotify tasks.
-        github (bool); Whether to run the GitHub task.
+class CountersProgram:
     """
-    # Load data from central JSON file
-    try:
-        data = load_json()
-        print("JSON data loaded.")
-    except Exception as e:
-        print("FAILED to load JSON data.")
-        fails.json = e
-        return
+    Encapsulation of main program. Runs the pipeline of steps to load
+    the central JSON configuration file, prepare updaters, and run
+    updaters, populating the provided failure log with any errors
+    encountered.
+    """
 
-    # Initialize Edge driver
-    try:
-        if path is None:
-            driver_path = EdgeChromiumDriverManager().install()
-        else:
-            driver_path = str(path)
-        service = Service(executable_path=driver_path)
-        options = Options()
-        if not windowed:
-            options.add_argument("--headless")
-        # Headless option by default causes window to be tiny, which interferes
-        # with finding elements if it's rendered responsively
-        # print(f"Using profile at {PROFILE_PATH}")
-        # options.add_argument(f"user-data-dir={PROFILE_PATH}")
-        # print(f"Using User-Agent={USER_AGENT}")
-        # options.add_argument(f"user-agent={USER_AGENT}")
-        driver = webdriver.Edge(service=service, options=options)
-        driver.implicitly_wait(WAIT_TIMEOUT)
-        driver.maximize_window()
-        print("Driver initialized.")
-    except Exception as e:
-        print("FAILED to initialize driver.")
-        fails.driver = e
-        return
+    def __init__(
+        self,
+        options: ProgramOptions,
+        failure_log: FailureLog,
+    ) -> None:
+        self.options = options
+        self.failure_log = failure_log
 
-    # Don't let the failure of one task stop the others
-    # Compile the raised exceptions in the TaskFailure instance instead
+    def run(self) -> None:
+        """Run the main process."""
+        data = self._load_bio_config_json()
+        if data is None:
+            return
 
-    if discord:
+        driver = self._init_web_driver()
+        if driver is None:
+            return
+
         try:
-            discord_status = get_discord_task(data)
-            update_status(driver, discord_status)
-            print("Updated Discord custom status.")
-        except Exception as e:
-            print("FAILED to update Discord custom status.")
-            fails.discord = e
+            updaters = self._get_updaters(data, driver)
+            self._run_updaters(updaters)
+        finally:
+            driver.quit()
 
-    if instagram:
+    def _load_bio_config_json(self) -> dict | None:
         try:
-            instagram_bio = get_instagram_task(data)
-            update_bio(driver, instagram_bio)
-            print("Updated Instagram bio.")
-        except Exception as e:
-            print("FAILED to update Instagram bio.")
-            fails.instagram = e
+            data = load_bio_config_json()
+            print("JSON data loaded.")
+            return data
+        except Exception as exc:
+            print("FAILED to load JSON data.")
+            self.failure_log.json = exc
+            return None
 
-    if spotify:
+    def _init_web_driver(self) -> webdriver.Edge | None:
         try:
-            spotify_tasks = get_spotify_tasks(data)
-        except Exception as e:
-            fails.spotify[None] = e
-        else:
-            for task in spotify_tasks:
-                playlist_id = task["playlist_id"]
-                try:
-                    update_playlist(**task)  # type: ignore
-                    print(f"Updated Spotify playlist with ID={playlist_id}.")
-                except Exception as e:
-                    print(
-                        f"FAILED to update Spotify playlist with ID={playlist_id}.")
-                    fails.spotify[playlist_id] = e
+            if self.options.driver_path is None:
+                driver_path = EdgeChromiumDriverManager().install()
+            else:
+                driver_path = str(self.options.driver_path)
 
-    if github:
-        try:
-            github_bio = get_github_task(data)
-            update_profile_bio(github_bio)
-            print("Updated GitHub bio.")
-        except Exception as e:
-            print("FAILED to update GitHub bio.")
-            fails.github = e
+            service = Service(executable_path=driver_path)
+            options = Options()
+            if not self.options.windowed:
+                options.add_argument("--headless")
 
-    # Cleanup
-    driver.quit()
+            driver = webdriver.Edge(service=service, options=options)
+            driver.implicitly_wait(WAIT_TIMEOUT)
+            driver.maximize_window()
+            print("Driver initialized.")
+            return driver
+
+        except Exception as exc:
+            print("FAILED to initialize driver.")
+            self.failure_log.driver = exc
+            return None
+
+    def _get_updaters(
+        self,
+        data: dict,
+        driver: webdriver.Edge,
+    ) -> list[Updater]:
+        updaters = list[Updater]()
+
+        # The tasks for these platforms are self-contained.
+
+        if self.options.run_discord:
+            updaters.append(DiscordUpdater(data["discord"], driver))
+
+        if self.options.run_instagram:
+            updaters.append(InstagramUpdater(data["instagram"], driver))
+
+        if self.options.run_github:
+            updaters.append(GitHubUpdater(data["github"], driver))
+
+        # Spotify is by playlist, and its key maps to a list of playlist
+        # configuration objects.
+
+        if self.options.run_spotify:
+            for playlist_config in data["spotify"]:
+                updater = SpotifyPlaylistUpdater(playlist_config, driver)
+                updaters.append(updater)
+
+        return updaters
+
+    def _run_updaters(self, updaters: list[Updater]) -> None:
+        if not updaters:
+            print(
+                "Nothing to update! "
+                f"Check your configuration file at {JSON_FILE_PATH}."
+            )
+            return
+
+        today = date.today()
+
+        for updater in updaters:
+            platform_name = updater.platform_name
+            try:
+                details = updater.prepare_details(today)
+                updater.update_bio(details)
+                print(f"Updated {platform_name}.")
+            except Exception as exc:
+                print_error(f"FAILED to update {platform_name}.")
+                self.failure_log.platforms[platform_name] = exc
