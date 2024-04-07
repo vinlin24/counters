@@ -12,8 +12,8 @@ from rich.table import Table
 from rich.text import Text
 
 from ..bios import day_number
-from ..config import (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET,
-                      SPOTIFY_USER_REFRESH)
+from ..config import (PLATFORM_SPOTIFY, SPOTIFY_CLIENT_ID,
+                      SPOTIFY_CLIENT_SECRET, SPOTIFY_USER_REFRESH)
 from ..updaters.base import Updater
 from ..utils import UNCHANGED_TEXT, format_generic_task_preview
 
@@ -33,6 +33,10 @@ class SpotifyPlaylistDetails(TypedDict):
 
 
 class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
+    @property
+    def platform_name(self) -> str:
+        return f"{PLATFORM_SPOTIFY} Playlist (ID={self.data['playlist_id']})"
+
     def prepare_details(self, today: date) -> SpotifyPlaylistDetails:
         # Fill day number placeholders if included
         name: str | None = self.data["name"]

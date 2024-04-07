@@ -66,6 +66,14 @@ ERROR_EMAIL_PASSWORD = os.environ["ERROR_EMAIL_PASSWORD"]
 # """User-Agent string to use."""
 
 
+# ==================== SUPPORTED_PLATFORMS ==================== #
+
+PLATFORM_DISCORD = "Discord"
+PLATFORM_INSTAGRAM = "Instagram"
+PLATFORM_SPOTIFY = "Spotify"
+PLATFORM_GITHUB = "GitHub"
+
+
 # ==================== EXIT CODES/BITFLAGS ==================== #
 
 # Bits:

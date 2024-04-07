@@ -10,7 +10,7 @@ from github import Auth, Github
 from rich.panel import Panel
 
 from ..bios import day_number
-from ..config import GITHUB_PAT
+from ..config import GITHUB_PAT, PLATFORM_GITHUB
 from ..updaters.base import Updater
 from ..utils import format_generic_task_preview
 
@@ -20,6 +20,10 @@ class GitHubDetails(TypedDict):
 
 
 class GitHubUpdater(Updater[GitHubDetails]):
+    @property
+    def platform_name(self) -> str:
+        return PLATFORM_GITHUB
+
     def prepare_details(self, today: date) -> GitHubDetails:
         # Fill placeholder in bio template if provided.
         start: date | None = self.data["start"]

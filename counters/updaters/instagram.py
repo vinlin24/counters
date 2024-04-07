@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from ..bios import day_number
-from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME
+from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, PLATFORM_INSTAGRAM
 from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, NOT_NOW_BUTTON,
                                    PASSWORD_INPUT, SUBMIT_BUTTON,
                                    USERNAME_INPUT)
@@ -27,6 +27,10 @@ class InstagramDetails(TypedDict):
 
 
 class InstagramUpdater(Updater[InstagramDetails]):
+    @property
+    def platform_name(self) -> str:
+        return PLATFORM_INSTAGRAM
+
     def prepare_details(self, today: date) -> InstagramDetails:
         # Fill placeholder in bio template if provided.
         start: date | None = self.data["start"]

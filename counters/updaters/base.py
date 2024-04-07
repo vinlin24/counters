@@ -26,6 +26,11 @@ class Updater(ABC, Generic[DetailsDict]):
         self.data = data
         self.driver = driver
 
+    @property
+    @abstractmethod
+    def platform_name(self) -> str:
+        """The name of the platform this updater is for."""
+
     @abstractmethod
     def prepare_details(self, today: date) -> DetailsDict:
         """Prepare the details to use when updating the bio."""

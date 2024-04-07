@@ -11,7 +11,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 from ..bios import day_number
-from ..config import DISCORD_EMAIL, DISCORD_PASSWORD
+from ..config import DISCORD_EMAIL, DISCORD_PASSWORD, PLATFORM_DISCORD
 # Experimenting CSS selectors as an alternative to full XPaths
 # Not sure how often these will change in comparison
 from ..selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
@@ -25,6 +25,10 @@ class DiscordDetails(TypedDict):
 
 
 class DiscordUpdater(Updater[DiscordDetails]):
+    @property
+    def platform_name(self) -> str:
+        return PLATFORM_DISCORD
+
     def prepare_details(self, today: date) -> DiscordDetails:
         # Fill placeholder in status template if provided.
         start: date | None = self.data["start"]
