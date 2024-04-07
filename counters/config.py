@@ -4,6 +4,8 @@ Load and expose configuration options as constants.
 """
 
 import os
+from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 import dotenv
@@ -81,3 +83,21 @@ EXIT_FAILURE_DISCORD = 1 << 2
 EXIT_FAILURE_INSTAGRAM = 1 << 3
 EXIT_FAILURE_SPOTIFY = 1 << 4
 EXIT_FAILURE_GITHUB = 1 << 5
+
+
+# ==================== PROGRAM OPTIONS ==================== #
+
+@dataclass
+class ProgramOptions:
+    """
+    Program options, post-processed from the command line as needed.
+    """
+    console_only: bool
+    windowed: bool
+    driver_path: Path | None
+    run_discord: bool
+    run_instagram: bool
+    run_spotify: bool
+    run_github: bool
+    dry_run_date: date | None
+    log_discord_status: bool
