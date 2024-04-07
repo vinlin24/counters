@@ -26,11 +26,9 @@ class DiscordDetails(TypedDict):
 
 class DiscordUpdater(Updater[DiscordDetails]):
     def prepare_details(self, today: date) -> DiscordDetails:
-        task: dict = self.data["discord"]
-
         # Fill placeholder in status template if provided.
-        start: date | None = task["start"]
-        status: str | None = task["status"]
+        start: date | None = self.data["start"]
+        status: str | None = self.data["status"]
         if start is not None and status is not None:
             status = status.format(day_number(start, today))
 
@@ -47,7 +45,7 @@ class DiscordUpdater(Updater[DiscordDetails]):
     def format_preview(self, details: DiscordDetails) -> Panel:
         return format_generic_task_preview(
             platform_name="Discord",
-            body_text=details["status"],
+            body=details["status"],
             color="blue",
         )
 

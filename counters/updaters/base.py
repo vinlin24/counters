@@ -18,7 +18,7 @@ class Updater(ABC, Generic[DetailsDict]):
         """Initialize the updater.
 
         Args:
-            data (dict): Loaded configuration JSON.
+            data (dict): Loaded configuration JSON for this updater.
             driver (webdriver.Edge): Selenium web driver instance. It is
             up to the implementation of the updater whether it makes use
             of it or not.

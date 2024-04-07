@@ -8,78 +8,86 @@ from typing import TypedDict
 
 import tekore
 from rich.panel import Panel
-from selenium import webdriver
+from rich.table import Table
+from rich.text import Text
 
 from ..bios import day_number
 from ..config import (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET,
                       SPOTIFY_USER_REFRESH)
 from ..updaters.base import Updater
+from ..utils import UNCHANGED_TEXT, format_generic_task_preview
+
+# Refresh token and instantiate client once to minimize API calls.
+_token = tekore.refresh_user_token(
+    client_id=SPOTIFY_CLIENT_ID,
+    client_secret=SPOTIFY_CLIENT_SECRET,
+    refresh_token=SPOTIFY_USER_REFRESH,
+)
+_spotify = tekore.Spotify(_token.access_token)
 
 
-class PlaylistDetails(TypedDict):
+class SpotifyPlaylistDetails(TypedDict):
     id: str
     name: str | None
     description: str | None
 
 
-class SpotifyDetails(TypedDict):
-    playlists: list[PlaylistDetails]
+class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
+    def prepare_details(self, today: date) -> SpotifyPlaylistDetails:
+        # Fill day number placeholders if included
+        name: str | None = self.data["name"]
+        description: str | None = self.data["description"]
+        start: date | None = self.data["start"]
+        # comment: str | None = task.get("comment")
 
+        if start is not None:
+            if name is not None:
+                name = name.format(day_number(start, today))
+            if description is not None:
+                description = description.format(day_number(start, today))
 
-class SpotifyUpdater(Updater[SpotifyDetails]):
-    def __init__(self, data: dict, driver: webdriver.Edge) -> None:
-        super().__init__(data, driver)
-        token = tekore.refresh_user_token(
-            client_id=SPOTIFY_CLIENT_ID,
-            client_secret=SPOTIFY_CLIENT_SECRET,
-            refresh_token=SPOTIFY_USER_REFRESH,
+        playlist_details: SpotifyPlaylistDetails = {
+            "id": self.data["playlist_id"],
+            "name": name,
+            "description": description,
+        }
+        return playlist_details
+
+    def update_bio(self, details: SpotifyPlaylistDetails) -> None:
+        playlist_id = details["id"]
+        name = details["name"]
+        description = details["description"]
+        _spotify.playlist_change_details(
+            playlist_id=playlist_id,
+            name=name,  # type: ignore
+            description=description,  # type: ignore
         )
-        self.spotify = tekore.Spotify(token.access_token)
 
-    def prepare_details(self, today: date) -> SpotifyDetails:
-        tasks: list[dict] = self.data["spotify"]
+    def format_preview(self, details: SpotifyPlaylistDetails) -> Panel:
+        playlist_id = details["id"]
+        comment = Text(details.get("comment", "?"))
+        if details["name"]:
+            name = Text(details["name"])
+        else:
+            name = UNCHANGED_TEXT
+        if details["description"]:
+            description = Text(details["description"])
+        else:
+            description = UNCHANGED_TEXT
 
-        playlist_details = list[PlaylistDetails]()
-        for task in tasks:
-            # Fill day number placeholders if included
-            name: str | None = task["name"]
-            description: str | None = task["description"]
-            start: date | None = task["start"]
-            # comment: str | None = task.get("comment")
+        table = Table(style="green", show_header=False, expand=True)
+        table.add_column("", style="reset", justify="right")
+        table.add_column("", style="reset")
+        table.add_row("id", Text(playlist_id, style="black"))
+        table.add_row("comment", comment)
+        table.add_row("name", name)
+        table.add_row("description", description)
 
-            if start is not None:
-                if name is not None:
-                    name = name.format(day_number(start, today))
-                if description is not None:
-                    description = description.format(day_number(start, today))
-
-            one_playlist_details: PlaylistDetails = {
-                "id": task["playlist_id"],
-                "name": name,
-                "description": description,
-            }
-            playlist_details.append(one_playlist_details)
-
-        return {"playlists": playlist_details}
-
-    # TODO: This is a problem. Based on the uniform interface,
-    # update_bio has to update ALL playlists at once. But this breaks
-    # some existing things. Notably, error collection can no longer be
-    # granular at the playlist level since update_bio() black-boxes the
-    # updating of all playlists at once...
-    def update_bio(self, details: SpotifyDetails) -> None:
-        for one_playlist_details in details["playlists"]:
-            playlist_id = one_playlist_details["id"]
-            name = one_playlist_details["name"]
-            description = one_playlist_details["description"]
-            self.spotify.playlist_change_details(
-                playlist_id=playlist_id,
-                name=name,  # type: ignore
-                description=description,  # type: ignore
-            )
-
-    def format_preview(self, details: SpotifyDetails) -> Panel:
-        return Panel("TODO")  # TODO: figure out the playlist stuff.
+        return format_generic_task_preview(
+            platform_name="Spotify Playlist",
+            body=table,
+            color="green",
+        )
 
 
 # TODO: Replace below when finished refactoring other modules.

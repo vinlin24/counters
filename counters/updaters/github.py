@@ -21,11 +21,9 @@ class GitHubDetails(TypedDict):
 
 class GitHubUpdater(Updater[GitHubDetails]):
     def prepare_details(self, today: date) -> GitHubDetails:
-        task: dict = self.data["github"]
-
-        # Fill placeholder in bio template if provided
-        start: date | None = task["start"]
-        bio: str | None = task["bio"]
+        # Fill placeholder in bio template if provided.
+        start: date | None = self.data["start"]
+        bio: str | None = self.data["bio"]
         if start is not None and bio is not None:
             bio = bio.format(day_number(start, today))
 
@@ -43,7 +41,7 @@ class GitHubUpdater(Updater[GitHubDetails]):
     def format_preview(self, details: GitHubDetails) -> Panel:
         return format_generic_task_preview(
             platform_name="GitHub",
-            body_text=details["bio"],
+            body=details["bio"],
             color="white",
         )
 

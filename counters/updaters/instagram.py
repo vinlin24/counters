@@ -28,11 +28,9 @@ class InstagramDetails(TypedDict):
 
 class InstagramUpdater(Updater[InstagramDetails]):
     def prepare_details(self, today: date) -> InstagramDetails:
-        task: dict = self.data["instagram"]
-
-        # Fill placeholder in bio template if provided
-        start: date | None = task["start"]
-        bio: str | None = task["bio"]
+        # Fill placeholder in bio template if provided.
+        start: date | None = self.data["start"]
+        bio: str | None = self.data["bio"]
         if start is not None and bio is not None:
             bio = bio.format(day_number(start, today))
 
@@ -50,7 +48,7 @@ class InstagramUpdater(Updater[InstagramDetails]):
     def format_preview(self, details: InstagramDetails) -> Panel:
         return format_generic_task_preview(
             platform_name="Instagram",
-            body_text=details["bio"],
+            body=details["bio"],
             color="bright_magenta",
         )
 
