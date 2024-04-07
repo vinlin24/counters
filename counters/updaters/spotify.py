@@ -30,6 +30,7 @@ class SpotifyPlaylistDetails(TypedDict):
     id: str
     name: str | None
     description: str | None
+    comment: str | None
 
 
 class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
@@ -42,7 +43,7 @@ class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
         name: str | None = self.data["name"]
         description: str | None = self.data["description"]
         start: date | None = self.data["start"]
-        # comment: str | None = task.get("comment")
+        comment: str | None = self.data.get("comment")
 
         if start is not None:
             if name is not None:
@@ -54,6 +55,7 @@ class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
             "id": self.data["playlist_id"],
             "name": name,
             "description": description,
+            "comment": comment,
         }
         return playlist_details
 
@@ -69,7 +71,7 @@ class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
 
     def format_preview(self, details: SpotifyPlaylistDetails) -> Panel:
         playlist_id = details["id"]
-        comment = Text(details.get("comment", "?"))
+        comment = Text(details.get("comment") or "?")
         if details["name"]:
             name = Text(details["name"])
         else:
