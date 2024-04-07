@@ -7,13 +7,14 @@ import logging
 import os
 import re
 import traceback
-from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Generator
 
 from .config import (EXIT_FAILURE_GITHUB, EXIT_FAILURE_INSTAGRAM,
-                     EXIT_FAILURE_SPOTIFY, LOG_FILE_PATH)
+                     EXIT_FAILURE_SPOTIFY, LOG_FILE_PATH, PLATFORM_GITHUB,
+                     PLATFORM_INSTAGRAM, PLATFORM_SPOTIFY)
+from .utils import print_error
 
 logging.basicConfig(filename=LOG_FILE_PATH,
                     filemode="at",
@@ -23,46 +24,31 @@ logging.basicConfig(filename=LOG_FILE_PATH,
 log = logging.getLogger(__package__)
 
 
-@dataclass
-class TaskFailure:
+class FailureLog:
     """Object to record exceptions raised in main process."""
 
-    json: Exception | None = None
-    """Error in loading the central JSON file."""
+    def __init__(self) -> None:
+        self.json: Exception | None = None
+        """Error in loading the central JSON file."""
 
-    driver: Exception | None = None
-    """Error in loading the Edge web driver."""
+        self.driver: Exception | None = None
+        """Error in loading the Edge web driver."""
 
-    discord: Exception | None = None
-    """Error in the Discord task."""
-
-    instagram: Exception | None = None
-    """Error in the Instagram task."""
-
-    spotify: dict[str | None, Exception] = \
-        field(default_factory=dict)
-    """Mapping of Spotify playlist ID to the error in its task.
-
-    The key None is used for an error in getting the Spotify tasks
-    itself and not in running the task for the playlist.
-    """
-
-    github: Exception | None = None
-    """Error in the GitHub task."""
+        self.platforms: dict[str, Exception] = {}
+        """Error in updating the platforms."""
 
     def all_good(self) -> bool:
         """Return whether no failures were set."""
-        return all(not val for val in self.__dict__.values())
+        return self.json is None and self.driver is None and not self.platforms
 
     def print_tracebacks(self) -> None:
         """Print the stored tracebacks for --console debugging."""
-        for val in self.__dict__.values():
-            # self.spotify is a dict
-            if val is self.spotify:
-                for error in self.spotify.values():
-                    print(_format_error(error))
-            elif val:
-                print(_format_error(val))
+        if self.json:
+            print_error(self._format_error(self.json))
+        if self.driver:
+            print_error(self._format_error(self.driver))
+        for exc in self.platforms.values():
+            print_error(self._format_error(exc))
 
     def get_exit_code(self) -> int:
         """
@@ -70,132 +56,96 @@ class TaskFailure:
         tasks.
         """
         result = 0
-        if self.github:
+
+        if PLATFORM_GITHUB in self.platforms:
             result |= EXIT_FAILURE_GITHUB
-        if self.instagram:
+        if PLATFORM_INSTAGRAM in self.platforms:
             result |= EXIT_FAILURE_INSTAGRAM
-        if self.spotify:
-            result |= EXIT_FAILURE_SPOTIFY
-        if self.github:
+        if PLATFORM_GITHUB in self.platforms:
             result |= EXIT_FAILURE_GITHUB
+
+        # Spotify is by playlist, so the "platform" names mention
+        # playlist ID instead of just "Spotify".
+        if any(PLATFORM_SPOTIFY in key for key in self.platforms.keys()):
+            result |= EXIT_FAILURE_SPOTIFY
+
         return result
 
+    def generate_report(self, platforms_attempted: list[str]) -> str | None:
+        """Generate the status report from stored exceptions.
 
-def _format_error(error: Exception) -> str:
-    """Return the traceback of the error as a string.
+        Args:
+            platforms_attempted (list[str]): The `.platform_name`s of
+            the updaters executed.
 
-    Postcondition:
-        Adds an extra newline for padding.
-    """
-    return "".join(traceback.format_exception(error)) + "\n"
+        Returns:
+            str | None: Text to log or send. Return None if there are no
+            errors i.e. `failure_log.all_good() is True`.
+        """
+        if self.all_good():
+            return None
 
+        # Check the setup ones in the order they would be set.
+        if self.json:
+            content = "There was an error loading the central JSON file:\n"
+            content += self._format_error(self.json)
+            # No other errors could be reached if this failed.
+            return content
+        if self.driver:
+            content = "There was an error initializing the Edge web driver:\n"
+            content += self._format_error(self.driver)
+            # No other errors could be reached if this failed.
+            return content
 
-def format_content(fails: TaskFailure,
-                   discord: bool,
-                   instagram: bool,
-                   spotify: bool,
-                   github: bool,
-                   ) -> str | None:
-    """Generate the status report from stored exceptions.
+        # Summary lines.
+        summaries = list[str]()
 
-    Args:
-        fails (TaskFailure): Exception recorder instance.
-        discord (bool): Whether the Discord task was run.
-        instagram (bool): Whether the Instagram task was run.
-        spotify (bool): Whether the Spotify tasks were run.
-        github (bool): Whether the GitHub tasks were run.
+        # Independent task failures.
+        content = ""
 
-    Returns:
-        str | None: Text to log or send. Return None if there are no
-        errors i.e. `fails.all_good() is True`.
-
-    Postcondition:
-        Not that any function gives a shit after this but
-        `fails.spotify[None]`, if exists, is popped.
-    """
-    if fails.all_good():
-        return None
-
-    # Check the setup ones in the order they would be set
-    if fails.json:
-        content = "There was an error loading the central JSON file:\n"
-        content += _format_error(fails.json)
-        return content  # No other errors could be reached if this failed
-    if fails.driver:
-        content = "There was an error initializing the Edge web driver:\n"
-        content += _format_error(fails.driver)
-        return content  # No other errors could be reached if this failed
-
-    # Summary lines
-    summaries = []
-
-    # Independent task failures
-    content = ""
-    if discord:
-        if fails.discord:
-            content += "Couldn't update Discord custom status:\n"
-            content += _format_error(fails.discord)
-            summaries.append("Discord: FAILED")
-        else:
-            summaries.append("Discord: SUCCESS")
-
-    if instagram:
-        if fails.instagram:
-            content += "Couldn't update Instagram custom status:\n"
-            content += _format_error(fails.instagram)
-            summaries.append("Instagram: FAILED")
-        else:
-            summaries.append("Instagram: SUCCESS")
-
-    if spotify:
-        if fails.spotify:
-            # Overall failure
-            if None in fails.spotify:
-                content += "There was an error getting the Spotify tasks:\n"
-                content += _format_error(fails.spotify[None])
-                summaries.append("Spotify: FAILED")
-            # Playlist-specific failure
+        for platform_name in platforms_attempted:
+            exc = self.platforms.get(platform_name)
+            if exc is None:
+                summaries.append(f"{platform_name}: SUCCESS")
             else:
-                for playlist_id, error in fails.spotify.items():
-                    content += ("Couldn't update details of Spotify playlist with "
-                                f"ID {playlist_id}:\n")
-                    content += _format_error(error)
-                    summaries.append(f"Spotify (ID={playlist_id}): FAILED")
+                content += f"Couldn't update {platform_name}:\n"
+                content += self._format_error(exc)
+                summaries.append(f"{platform_name}: FAILED")
+
+        content += "\n".join(summaries) + "\n"
+
+        # Disclaimer.
+        repo_path = Path(__file__).parent.parent  # file -> package -> repo
+        content += (
+            "\nThis message was automatically generated and sent by the "
+            f"counters program running locally at {repo_path}.\n"
+        )
+
+        return content
+
+    def write_report_to_file(self, report: str | None) -> None:
+        """Log the status of the program's execution.
+
+        Args:
+            report (str | None): Error report. None if no errors
+            occurred.
+        """
+        entry = f"[{datetime.now()}] "
+        if report is None:
+            entry += "No problems detected.\n"
         else:
-            summaries.append("Spotify: SUCCESS")
+            entry += f"Encountered errors:\n{report}\n"
 
-    if github:
-        if fails.github:
-            content += "Couldn't update GitHub profile bio:\n"
-            content += _format_error(fails.github)
-            summaries.append("GitHub: FAILED")
-        else:
-            summaries.append("GitHub: SUCCESS")
+        with LOG_FILE_PATH.open("at", encoding="utf-8") as fp:
+            fp.write(entry)
 
-    content += "\n".join(summaries) + "\n"
+    def _format_error(self, error: Exception) -> str:
+        """Return the traceback of the error as a string.
 
-    # Disclaimer
-    repo_path = Path(__file__).parent.parent  # file -> package -> repo
-    content += ("\nThis message was automatically generated and sent by the "
-                f"counters program running locally at {repo_path}.\n")
-
-    return content
-
-
-def log_report(report: str | None) -> None:
-    """Log the status of the program's execution.
-
-    Args:
-        report (str | None): Error report. None if no errors occurred.
-    """
-    entry = f"[{datetime.now()}] "
-    if report is None:
-        entry += "No problems detected.\n"
-    else:
-        entry += f"Encountered errors:\n{report}\n"
-
-    with open(LOG_FILE_PATH, "at", encoding="utf-8") as fp:
-        fp.write(entry)
+        Postcondition:
+            Adds an extra newline for padding.
+        """
+        return "".join(traceback.format_exception(error)) + "\n"
 
 
 def get_last_success_timestamp() -> datetime | None:
@@ -214,33 +164,33 @@ def get_last_success_timestamp() -> datetime | None:
 
 
 def _reverse_readline(
-    filename: str | Path,
+    file_path: Path,
     buf_size: int = 8192
 ) -> Generator[str, None, None]:
     """Yield the lines of a file in reverse order.
 
-    Code from: https://stackoverflow.com/a/23646049/14226122.
+    Code adapted from: https://stackoverflow.com/a/23646049/14226122.
     """
-    with open(filename, "rb") as fh:
+    with file_path.open("rb") as fp:
         segment = None
         offset = 0
-        fh.seek(0, os.SEEK_END)
-        file_size = remaining_size = fh.tell()
+        fp.seek(0, os.SEEK_END)
+        file_size = remaining_size = fp.tell()
         while remaining_size > 0:
             offset = min(file_size, offset + buf_size)
-            fh.seek(file_size - offset)
-            buffer = fh.read(
+            fp.seek(file_size - offset)
+            buffer = fp.read(
                 min(remaining_size, buf_size)).decode(
                 encoding="utf-8")
             remaining_size -= buf_size
             lines = buffer.split("\n")
             # The first line of the buffer is probably not a complete
             # line so we'll save it and append it to the last line of
-            # the next buffer we read
+            # the next buffer we read.
             if segment is not None:
                 # If the previous chunk starts right from the beginning
                 # of line do not concat the segment to the last line of
-                # new chunk. Instead, yield the segment first
+                # new chunk. Instead, yield the segment first.
                 if buffer[-1] != "\n":
                     lines[-1] += segment
                 else:
@@ -249,6 +199,6 @@ def _reverse_readline(
             for index in range(len(lines) - 1, 0, -1):
                 if lines[index]:
                     yield lines[index]
-        # Don't yield None if the file was empty
+        # Don't yield None if the file was empty.
         if segment is not None:
             yield segment

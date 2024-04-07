@@ -3,24 +3,47 @@
 Interface for updating the GitHub profile bio.
 """
 
+from datetime import date
+from typing import TypedDict
+
 from github import Auth, Github
+from rich.panel import Panel
 
-from ..config import GITHUB_PAT
+from ..config import GITHUB_PAT, PLATFORM_GITHUB
+from ..utils import format_generic_task_preview
+from .base import Updater
 
-# ==================== INTERFACE FUNCTION ==================== #
+
+class GitHubDetails(TypedDict):
+    bio: str | None
 
 
-def update_profile_bio(bio: str | None) -> None:
-    """Update GitHub profile bio with new text.
+class GitHubUpdater(Updater[GitHubDetails]):
+    @property
+    def platform_name(self) -> str:
+        return PLATFORM_GITHUB
 
-    Args:
-        status (str | None, optional): New bio text. Defaults to None,
-        meaning leave the status unchanged, in which case, this function
-        does nothing.
-    """
-    if bio is None:
-        return
-    auth = Auth.Token(GITHUB_PAT)
-    github = Github(auth=auth)
-    user = github.get_user()
-    user.edit(bio=bio)
+    def prepare_details(self, today: date) -> GitHubDetails:
+        # Fill placeholder in bio template if provided.
+        start: date | None = self.data["start"]
+        bio: str | None = self.data["bio"]
+        if start is not None and bio is not None:
+            bio = bio.format(self.day_number(start, today))
+
+        return {"bio": bio}
+
+    def update_bio(self, details: GitHubDetails, _) -> None:
+        bio = details["bio"]
+        if bio is None:
+            return
+        auth = Auth.Token(GITHUB_PAT)
+        github = Github(auth=auth)
+        user = github.get_user()
+        user.edit(bio=bio)
+
+    def format_preview(self, details: GitHubDetails) -> Panel:
+        return format_generic_task_preview(
+            platform_name="GitHub",
+            body=details["bio"],
+            color="white",
+        )
