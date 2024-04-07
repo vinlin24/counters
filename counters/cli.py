@@ -11,7 +11,6 @@ from pathlib import Path
 
 from .config import EXIT_FAILURE_STATUS_LOGGER, EXIT_SUCCESS, ProgramOptions
 from .core import CountersProgram
-from .dry_run import print_dry_run
 from .status_logger.core import run_status_logger
 
 
@@ -115,11 +114,6 @@ def main() -> None:
     if options.console_only:
         logging.disable(100)
 
-    if options.dry_run_date is not None:
-        # TODO: refactor this into a class too?
-        print_dry_run(options.dry_run_date)
-        sys.exit(EXIT_SUCCESS)
-
     # Run status-logger sub-program and ignore everything else.
     if options.log_discord_status:
         success = run_status_logger(console_only=options.console_only,
@@ -131,7 +125,7 @@ def main() -> None:
     counters = CountersProgram(options)
     exit_code = counters.run()
 
-    # So the scheduler conveys the failure too.
+    # So the scheduler/script conveys the failure too.
     sys.exit(exit_code)
 
 

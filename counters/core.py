@@ -8,6 +8,7 @@ from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 from .config import EXIT_FAILURE, JSON_FILE_PATH, WAIT_TIMEOUT, ProgramOptions
+from .dry_run import execute_dry_run
 from .emailer import send_email
 from .loader import load_bio_config_json
 from .logger import FailureLog
@@ -41,11 +42,16 @@ class CountersProgram:
         if driver is None:
             return EXIT_FAILURE
 
-        try:
-            updaters = self._get_updaters(data, driver)
-            self._run_updaters(updaters)
-        finally:
-            driver.quit()
+        updaters = self._get_updaters(data, driver)
+
+        # TODO: since this comes after initializing the web driver, the
+        # user has to wait a bit longer as well as get unnecessary
+        # output before seeing the actual previews.
+        if self.options.dry_run_date is not None:
+            return execute_dry_run(updaters, self.options.dry_run_date)
+
+        self._run_updaters(updaters)
+        driver.quit()
 
         self._write_failure_report(updaters)
         return self.failure_log.get_exit_code()
