@@ -71,8 +71,12 @@ class FailureLog:
 
         return result
 
-    def generate_report(self) -> str | None:
+    def generate_report(self, platforms_attempted: list[str]) -> str | None:
         """Generate the status report from stored exceptions.
+
+        Args:
+            platforms_attempted (list[str]): The `.platform_name`s of
+            the updaters executed.
 
         Returns:
             str | None: Text to log or send. Return None if there are no
@@ -99,13 +103,14 @@ class FailureLog:
         # Independent task failures.
         content = ""
 
-        # TODO: Somehow connect this part of the code to the updaters in
-        # the main CountersProgram so we know what tasks were successful
-        # too.
-        for platform_name, exc in self.platforms.items():
-            content += f"Couldn't update {platform_name}:\n"
-            content += self._format_error(exc)
-            summaries.append(f"{platform_name}: FAILED")
+        for platform_name in platforms_attempted:
+            exc = self.platforms.get(platform_name)
+            if exc is None:
+                summaries.append(f"{platform_name}: SUCCESS")
+            else:
+                content += f"Couldn't update {platform_name}:\n"
+                content += self._format_error(exc)
+                summaries.append(f"{platform_name}: FAILED")
 
         content += "\n".join(summaries) + "\n"
 
@@ -122,7 +127,8 @@ class FailureLog:
         """Log the status of the program's execution.
 
         Args:
-            report (str | None): Error report. None if no errors occurred.
+            report (str | None): Error report. None if no errors
+            occurred.
         """
         entry = f"[{datetime.now()}] "
         if report is None:

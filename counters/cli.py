@@ -12,8 +12,6 @@ from pathlib import Path
 from .config import EXIT_FAILURE_STATUS_LOGGER, EXIT_SUCCESS, ProgramOptions
 from .core import CountersProgram
 from .dry_run import print_dry_run
-from .emailer import send_email
-from .logger import FailureLog
 from .status_logger.core import run_status_logger
 
 
@@ -129,22 +127,12 @@ def main() -> None:
                                     driver_path=options.driver_path)
         sys.exit(EXIT_SUCCESS if success else EXIT_FAILURE_STATUS_LOGGER)
 
-    # run the main program.
-    failure_log = FailureLog()
-    counters = CountersProgram(options, failure_log)
-    counters.run()
-
-    # Log and send failure report is there was any error. TODO: merge
-    # this into the CountersProgram class?
-    if not options.console_only:
-        report = failure_log.generate_report()
-        failure_log.write_report_to_file(report)
-        send_email(report)
-    else:
-        failure_log.print_tracebacks()
+    # Run the main program.
+    counters = CountersProgram(options)
+    exit_code = counters.run()
 
     # So the scheduler conveys the failure too.
-    sys.exit(failure_log.get_exit_code())
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

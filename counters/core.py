@@ -7,7 +7,8 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-from .config import JSON_FILE_PATH, WAIT_TIMEOUT, ProgramOptions
+from .config import EXIT_FAILURE, JSON_FILE_PATH, WAIT_TIMEOUT, ProgramOptions
+from .emailer import send_email
 from .loader import load_bio_config_json
 from .logger import FailureLog
 from .updaters.base import Updater
@@ -26,29 +27,28 @@ class CountersProgram:
     encountered.
     """
 
-    def __init__(
-        self,
-        options: ProgramOptions,
-        failure_log: FailureLog,
-    ) -> None:
+    def __init__(self, options: ProgramOptions) -> None:
         self.options = options
-        self.failure_log = failure_log
+        self.failure_log = FailureLog()
 
-    def run(self) -> None:
-        """Run the main process."""
+    def run(self) -> int:
+        """Run the main process and return the exit code to use."""
         data = self._load_bio_config_json()
         if data is None:
-            return
+            return EXIT_FAILURE
 
         driver = self._init_web_driver()
         if driver is None:
-            return
+            return EXIT_FAILURE
 
         try:
             updaters = self._get_updaters(data, driver)
             self._run_updaters(updaters)
         finally:
             driver.quit()
+
+        self._write_failure_report(updaters)
+        return self.failure_log.get_exit_code()
 
     def _load_bio_config_json(self) -> dict | None:
         try:
@@ -130,3 +130,12 @@ class CountersProgram:
             except Exception as exc:
                 print_error(f"FAILED to update {platform_name}.")
                 self.failure_log.platforms[platform_name] = exc
+
+    def _write_failure_report(self, updaters: list[Updater]) -> None:
+        if not self.options.console_only:
+            platforms_attempted = [u.platform_name for u in updaters]
+            report = self.failure_log.generate_report(platforms_attempted)
+            self.failure_log.write_report_to_file(report)
+            send_email(report)
+        else:
+            self.failure_log.print_tracebacks()
