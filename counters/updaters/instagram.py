@@ -40,14 +40,18 @@ class InstagramUpdater(Updater[InstagramDetails]):
 
         return {"bio": bio}
 
-    def update_bio(self, details: InstagramDetails) -> None:
+    def update_bio(
+        self,
+        details: InstagramDetails,
+        driver: webdriver.Edge,
+    ) -> None:
         bio = details["bio"]
         if bio is None:
             return
-        self.driver.get("https://www.instagram.com/accounts/edit")
-        self._login()
-        self._navigate_to_profile()
-        self._update_profile(bio)
+        driver.get("https://www.instagram.com/accounts/edit")
+        self._login(driver)
+        self._navigate_to_profile(driver)
+        self._update_profile(driver, bio)
 
     def format_preview(self, details: InstagramDetails) -> Panel:
         return format_generic_task_preview(
@@ -56,12 +60,12 @@ class InstagramUpdater(Updater[InstagramDetails]):
             color="bright_magenta",
         )
 
-    def _login(self) -> None:
+    def _login(self, driver: webdriver.Edge) -> None:
         """Handle the authentication landing page."""
         # Find elements
-        username_elem = self.driver.find_element(*USERNAME_INPUT)
-        password_elem = self.driver.find_element(*PASSWORD_INPUT)
-        login_button = self.driver.find_element(*LOGIN_BUTTON)
+        username_elem = driver.find_element(*USERNAME_INPUT)
+        password_elem = driver.find_element(*PASSWORD_INPUT)
+        login_button = driver.find_element(*LOGIN_BUTTON)
 
         # Input credentials and login
         username_elem.clear()
@@ -70,7 +74,7 @@ class InstagramUpdater(Updater[InstagramDetails]):
         password_elem.send_keys(INSTAGRAM_PASSWORD)
         login_button.click()
 
-    def _navigate_to_profile(self) -> None:
+    def _navigate_to_profile(self, driver: webdriver.Edge) -> None:
         """
         Handle navigating to the profile edit page after
         authenticated.
@@ -81,13 +85,13 @@ class InstagramUpdater(Updater[InstagramDetails]):
         )
         try:
             not_now_button: WebElement = \
-                WebDriverWait(self.driver, 5).until(condition)
+                WebDriverWait(driver, 5).until(condition)
             not_now_button.click()
         except TimeoutException:
             # Just try to redirect again bro sigh
-            self.driver.get("https://www.instagram.com/accounts/edit")
+            driver.get("https://www.instagram.com/accounts/edit")
 
-    def _update_profile(self, bio: str) -> None:
+    def _update_profile(self, driver: webdriver.Edge, bio: str) -> None:
         """Handle updating the bio after reaching the edit profile page.
 
         Args:
@@ -98,19 +102,19 @@ class InstagramUpdater(Updater[InstagramDetails]):
             `WAIT_TIMEOUT` seconds.
         """
         # Find elements
-        bio_box = self.driver.find_element(*BIO_BOX)
+        bio_box = driver.find_element(*BIO_BOX)
 
         # Submit new bio string
         bio_box.clear()
         bio_box.send_keys(bio)
 
         # NOTE: If you don't edit anything, the button will be disabled
-        submit_button = self.driver.find_element(*SUBMIT_BUTTON)
+        submit_button = driver.find_element(*SUBMIT_BUTTON)
         submit_button.click()
 
         # Make sure the update registered
         # try:
-        #     WebDriverWait(self.driver, WAIT_TIMEOUT).until(
+        #     WebDriverWait(driver, WAIT_TIMEOUT).until(
         #         EC.presence_of_element_located((By.XPATH, XPATH_PROFILE_SAVED))
         #     )
         # except TimeoutException:

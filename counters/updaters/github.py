@@ -33,7 +33,7 @@ class GitHubUpdater(Updater[GitHubDetails]):
 
         return {"bio": bio}
 
-    def update_bio(self, details: GitHubDetails) -> None:
+    def update_bio(self, details: GitHubDetails, _) -> None:
         bio = details["bio"]
         if bio is None:
             return

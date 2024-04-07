@@ -38,19 +38,16 @@ class CountersProgram:
         if data is None:
             return EXIT_FAILURE
 
+        updaters = self._get_updaters(data)
+
+        if self.options.dry_run_date is not None:
+            return execute_dry_run(updaters, self.options.dry_run_date)
+
         driver = self._init_web_driver()
         if driver is None:
             return EXIT_FAILURE
 
-        updaters = self._get_updaters(data, driver)
-
-        # TODO: since this comes after initializing the web driver, the
-        # user has to wait a bit longer as well as get unnecessary
-        # output before seeing the actual previews.
-        if self.options.dry_run_date is not None:
-            return execute_dry_run(updaters, self.options.dry_run_date)
-
-        self._run_updaters(updaters)
+        self._run_updaters(updaters, driver)
         driver.quit()
 
         self._write_failure_report(updaters)
@@ -58,11 +55,9 @@ class CountersProgram:
 
     def _load_bio_config_json(self) -> dict | None:
         try:
-            data = load_bio_config_json()
-            print("JSON data loaded.")
-            return data
+            return load_bio_config_json()
         except Exception as exc:
-            print("FAILED to load JSON data.")
+            print_error("FAILED to load JSON data.")
             self.failure_log.json = exc
             return None
 
@@ -85,39 +80,39 @@ class CountersProgram:
             return driver
 
         except Exception as exc:
-            print("FAILED to initialize driver.")
+            print_error("FAILED to initialize driver.")
             self.failure_log.driver = exc
             return None
 
-    def _get_updaters(
-        self,
-        data: dict,
-        driver: webdriver.Edge,
-    ) -> list[Updater]:
+    def _get_updaters(self, data: dict) -> list[Updater]:
         updaters = list[Updater]()
 
         # The tasks for these platforms are self-contained.
 
         if self.options.run_discord:
-            updaters.append(DiscordUpdater(data["discord"], driver))
+            updaters.append(DiscordUpdater(data["discord"]))
 
         if self.options.run_instagram:
-            updaters.append(InstagramUpdater(data["instagram"], driver))
+            updaters.append(InstagramUpdater(data["instagram"]))
 
         if self.options.run_github:
-            updaters.append(GitHubUpdater(data["github"], driver))
+            updaters.append(GitHubUpdater(data["github"]))
 
         # Spotify is by playlist, and its key maps to a list of playlist
         # configuration objects.
 
         if self.options.run_spotify:
             for playlist_config in data["spotify"]:
-                updater = SpotifyPlaylistUpdater(playlist_config, driver)
+                updater = SpotifyPlaylistUpdater(playlist_config)
                 updaters.append(updater)
 
         return updaters
 
-    def _run_updaters(self, updaters: list[Updater]) -> None:
+    def _run_updaters(
+        self,
+        updaters: list[Updater],
+        driver: webdriver.Edge,
+    ) -> None:
         if not updaters:
             print(
                 "Nothing to update! "
@@ -131,7 +126,7 @@ class CountersProgram:
             platform_name = updater.platform_name
             try:
                 details = updater.prepare_details(today)
-                updater.update_bio(details)
+                updater.update_bio(details, driver)
                 print(f"Updated {platform_name}.")
             except Exception as exc:
                 print_error(f"FAILED to update {platform_name}.")

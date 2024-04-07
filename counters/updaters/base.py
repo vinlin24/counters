@@ -14,17 +14,13 @@ class Updater(ABC, Generic[DetailsDict]):
     social media platform.
     """
 
-    def __init__(self, data: dict, driver: webdriver.Edge) -> None:
+    def __init__(self, data: dict) -> None:
         """Initialize the updater.
 
         Args:
             data (dict): Loaded configuration JSON for this updater.
-            driver (webdriver.Edge): Selenium web driver instance. It is
-            up to the implementation of the updater whether it makes use
-            of it or not.
         """
         self.data = data
-        self.driver = driver
 
     @property
     @abstractmethod
@@ -36,7 +32,7 @@ class Updater(ABC, Generic[DetailsDict]):
         """Prepare the details to use when updating the bio."""
 
     @abstractmethod
-    def update_bio(self, details: DetailsDict) -> None:
+    def update_bio(self, details: DetailsDict, driver: webdriver.Edge) -> None:
         """Update the bio (or equivalent) on social media platform."""
 
     @abstractmethod

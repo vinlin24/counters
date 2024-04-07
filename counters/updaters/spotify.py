@@ -59,7 +59,7 @@ class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
         }
         return playlist_details
 
-    def update_bio(self, details: SpotifyPlaylistDetails) -> None:
+    def update_bio(self, details: SpotifyPlaylistDetails, _) -> None:
         playlist_id = details["id"]
         name = details["name"]
         description = details["description"]
