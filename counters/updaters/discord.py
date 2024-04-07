@@ -10,14 +10,13 @@ from rich.panel import Panel
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
-from ..bios import day_number
 from ..config import DISCORD_EMAIL, DISCORD_PASSWORD, PLATFORM_DISCORD
 # Experimenting CSS selectors as an alternative to full XPaths
 # Not sure how often these will change in comparison
 from ..selectors.discord import (AVATAR_ICON, EDIT_STATUS_ITEM, EMAIL_INPUT,
                                  PASSWORD_INPUT, SET_STATUS_ITEM, STATUS_INPUT)
-from ..updaters.base import Updater
 from ..utils import format_generic_task_preview
+from .base import Updater
 
 
 class DiscordDetails(TypedDict):
@@ -34,7 +33,7 @@ class DiscordUpdater(Updater[DiscordDetails]):
         start: date | None = self.data["start"]
         status: str | None = self.data["status"]
         if start is not None and status is not None:
-            status = status.format(day_number(start, today))
+            status = status.format(self.day_number(start, today))
 
         return {"status": status}
 

@@ -11,11 +11,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from ..bios import day_number
 from ..config import (PLATFORM_SPOTIFY, SPOTIFY_CLIENT_ID,
                       SPOTIFY_CLIENT_SECRET, SPOTIFY_USER_REFRESH)
-from ..updaters.base import Updater
 from ..utils import UNCHANGED_TEXT, format_generic_task_preview
+from .base import Updater
 
 # Refresh token and instantiate client once to minimize API calls.
 _token = tekore.refresh_user_token(
@@ -46,10 +45,11 @@ class SpotifyPlaylistUpdater(Updater[SpotifyPlaylistDetails]):
         comment: str | None = self.data.get("comment")
 
         if start is not None:
+            day_num = self.day_number(start, today)
             if name is not None:
-                name = name.format(day_number(start, today))
+                name = name.format(day_num)
             if description is not None:
-                description = description.format(day_number(start, today))
+                description = description.format(day_num)
 
         playlist_details: SpotifyPlaylistDetails = {
             "id": self.data["playlist_id"],

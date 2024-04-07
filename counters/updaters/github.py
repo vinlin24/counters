@@ -9,10 +9,9 @@ from typing import TypedDict
 from github import Auth, Github
 from rich.panel import Panel
 
-from ..bios import day_number
 from ..config import GITHUB_PAT, PLATFORM_GITHUB
-from ..updaters.base import Updater
 from ..utils import format_generic_task_preview
+from .base import Updater
 
 
 class GitHubDetails(TypedDict):
@@ -29,7 +28,7 @@ class GitHubUpdater(Updater[GitHubDetails]):
         start: date | None = self.data["start"]
         bio: str | None = self.data["bio"]
         if start is not None and bio is not None:
-            bio = bio.format(day_number(start, today))
+            bio = bio.format(self.day_number(start, today))
 
         return {"bio": bio}
 

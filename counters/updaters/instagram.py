@@ -13,13 +13,12 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ..bios import day_number
 from ..config import INSTAGRAM_PASSWORD, INSTAGRAM_USERNAME, PLATFORM_INSTAGRAM
 from ..selectors.instagram import (BIO_BOX, LOGIN_BUTTON, NOT_NOW_BUTTON,
                                    PASSWORD_INPUT, SUBMIT_BUTTON,
                                    USERNAME_INPUT)
-from ..updaters.base import Updater
 from ..utils import format_generic_task_preview
+from .base import Updater
 
 
 class InstagramDetails(TypedDict):
@@ -36,7 +35,7 @@ class InstagramUpdater(Updater[InstagramDetails]):
         start: date | None = self.data["start"]
         bio: str | None = self.data["bio"]
         if start is not None and bio is not None:
-            bio = bio.format(day_number(start, today))
+            bio = bio.format(self.day_number(start, today))
 
         return {"bio": bio}
 
