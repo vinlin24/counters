@@ -49,12 +49,13 @@ def _print_previews(updaters: list[Updater], date_to_simulate: date) -> None:
         panel = updater.format_preview(details)
         panels.append(panel)
 
-    half = len(panels) // 2 + 1
+    # +1 such that for odd numbers, the left column has one more.
+    half = (len(panels) + 1) // 2
     left_column = panels[:half]
     right_column = panels[half:]
 
     groups = [Group(*left_column), Group(*right_column)]
-    console.print(Columns(groups), justify="center")
+    console.print(Columns(groups))
 
 
 def _print_footer() -> None:
