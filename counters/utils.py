@@ -21,10 +21,16 @@ def format_generic_task_preview(
     header.justify = "right"
 
     null_text = Text("(config was `null`)", style="black")
-    panel = Panel(
-        null_text if body is None else body,
-        style=color,
-    )
+
+    # Embed the text in a panel if it's not a renderable.
+    if body is None or isinstance(body, str):
+        panel = Panel(
+            null_text if body is None else body,
+            style=color,
+        )
+    # Otherwise use the renderable itself.
+    else:
+        panel = body
 
     return Panel(
         Group(header, panel),
