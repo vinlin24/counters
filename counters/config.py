@@ -109,3 +109,4 @@ class ProgramOptions:
     run_github: bool
     dry_run_date: date | None
     log_discord_status: bool
+    dry_run_one_per_line: bool

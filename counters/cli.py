@@ -55,6 +55,12 @@ parser.add_argument(
     help="display the values that would be used if counters program were run",
 )
 parser.add_argument(
+    "-1",
+    dest="dry_run_one_per_line",
+    action="store_true",
+    help="display dry-run values one entry per line",
+)
+parser.add_argument(
     "-l", "--log-discord-status",
     action="store_true",
     help="log Discord custom status instead of updating counters",
@@ -105,6 +111,7 @@ def get_options() -> ProgramOptions:
         run_github=args.github,
         dry_run_date=args.dry_run,
         log_discord_status=args.log_discord_status,
+        dry_run_one_per_line=args.dry_run_one_per_line,
     )
 
 

@@ -41,7 +41,11 @@ class CountersProgram:
         updaters = self._get_updaters(data)
 
         if self.options.dry_run_date is not None:
-            return execute_dry_run(updaters, self.options.dry_run_date)
+            return execute_dry_run(
+                updaters,
+                self.options.dry_run_date,
+                self.options.dry_run_one_per_line,
+            )
 
         driver = self._init_web_driver()
         if driver is None:

@@ -20,14 +20,18 @@ console = Console()
 rich.traceback.install(console=console)
 
 
-def execute_dry_run(updaters: list[Updater], date_to_simulate: date) -> int:
+def execute_dry_run(
+    updaters: list[Updater],
+    date_to_simulate: date,
+    one_per_line: bool,
+) -> int:
     """
     Encapsulation of the `--dry-run` subprogram. Given updaters, query
     their console representations and format and output them to stdout.
     Return exit code.
     """
     _print_header(date_to_simulate)
-    _print_previews(updaters, date_to_simulate)
+    _print_previews(updaters, date_to_simulate, one_per_line)
     _print_footer()
     return EXIT_SUCCESS
 
@@ -42,19 +46,26 @@ def _print_header(date_to_simulate: date) -> None:
     console.print(header)
 
 
-def _print_previews(updaters: list[Updater], date_to_simulate: date) -> None:
+def _print_previews(
+    updaters: list[Updater],
+    date_to_simulate: date,
+    one_per_line: bool,
+) -> None:
     panels = list[Panel]()
     for updater in updaters:
         details = updater.prepare_details(date_to_simulate)
         panel = updater.format_preview(details)
         panels.append(panel)
 
-    # +1 such that for odd numbers, the left column has one more.
-    half = (len(panels) + 1) // 2
-    left_column = panels[:half]
-    right_column = panels[half:]
+    if one_per_line:
+        groups = [Group(*panels)]
+    else:
+        # +1 such that for odd numbers, the left column has one more.
+        half = (len(panels) + 1) // 2
+        left_column = panels[:half]
+        right_column = panels[half:]
+        groups = [Group(*left_column), Group(*right_column)]
 
-    groups = [Group(*left_column), Group(*right_column)]
     console.print(Columns(groups))
 
 
