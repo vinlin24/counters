@@ -16,4 +16,4 @@ __pycache__/
 *.code-workspace
 
 # Local only
-msedgedriver.exe
+msedgedriver*
