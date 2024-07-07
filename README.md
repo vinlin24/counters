@@ -144,7 +144,9 @@ at the command line.
 
 ## Demo
 
-<!-- TODO: Video demo is kind of outdated -->
+> [!NOTE]
+>
+> Video demo is kind of outdated. Will update eventually.
 
 Here's a screen recording of this program at work. I included the `--window` and
 `--console` flags for demonstration purposes only. The scheduled task runs the
