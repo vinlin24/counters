@@ -100,6 +100,7 @@ class ProgramOptions:
     """
     Program options, post-processed from the command line as needed.
     """
+    date_to_update_to: date
     console_only: bool
     windowed: bool
     driver_path: Path | None

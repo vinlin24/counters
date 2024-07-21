@@ -27,6 +27,14 @@ parser = ArgumentParser(
     description="Manually run counters program",
 )
 
+parser.add_argument(
+    "date_to_update_to",
+    nargs="?",
+    type=valid_iso_date,
+    default=date.today(),
+    help="date to update counters to (defaults to today)",
+)
+
 # Meta arguments.
 
 parser.add_argument(
@@ -102,6 +110,7 @@ def get_options() -> ProgramOptions:
         args.discord = args.instagram = args.spotify = args.github = True
 
     return ProgramOptions(
+        date_to_update_to=args.date_to_update_to,
         console_only=args.console,
         windowed=args.window,
         driver_path=args.path,

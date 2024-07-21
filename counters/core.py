@@ -124,12 +124,12 @@ class CountersProgram:
             )
             return
 
-        today = date.today()
+        date_to_update_to = self.options.date_to_update_to
 
         for updater in updaters:
             platform_name = updater.platform_name
             try:
-                details = updater.prepare_details(today)
+                details = updater.prepare_details(date_to_update_to)
                 updater.update_bio(details, driver)
                 print(f"Updated {platform_name}.")
             except Exception as exc:
