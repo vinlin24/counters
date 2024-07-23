@@ -23,7 +23,8 @@ LOGIN_BUTTON = CSSSelector("#loginForm > div > div:nth-child(3) > button")
 # Full XPath: /html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div/div/div
 
 NOT_NOW_BUTTON = XPathSelector(
-    "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div/div/div")
+    "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div/div/div/div"
+)
 """Button that appears as part of the "Save Your Login Info?" prompt.
 
 For some reason, the CSS selector doesn't work, so I'm using the full
@@ -38,7 +39,8 @@ BIO_BOX = CSSSelector("#pepBio")
 # Full XPath: /html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div[3]/div/div/form/div[4]/div
 
 SUBMIT_BUTTON = XPathSelector(
-    "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div[3]/div/div/form/div[4]/div")
+    "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div[3]/div/div/form/div[4]/div"
+)
 """Submit button on the "Edit profile" page.
 
 Note that you should make an edit first to change the submit button
