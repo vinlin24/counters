@@ -6,7 +6,7 @@ Defines the entry point for the Poetry script.
 import logging
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from .config import EXIT_FAILURE_STATUS_LOGGER, EXIT_SUCCESS, ProgramOptions
@@ -14,7 +14,22 @@ from .core import CountersProgram
 from .status_logger.core import run_status_logger
 
 
-def valid_iso_date(value: str) -> date:
+def valid_date(value: str) -> date:
+    """
+    Transform `value` into a date if possible, else raise
+    `argparse.ArgumentTypeError`.
+
+    Currently recognized date formats are ISO 8601 and certain
+    convenience literals e.g. `"tomorrow"`.
+    """
+    value = value.strip().lower()
+
+    # First try special literals.
+    if value in {"tomorrow", "tmrw", "tmr"}:
+        tomorrow = date.today() + timedelta(days=1)
+        return tomorrow
+
+    # Then try ISO 8601.
     try:
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
@@ -30,7 +45,7 @@ parser = ArgumentParser(
 parser.add_argument(
     "date_to_update_to",
     nargs="?",
-    type=valid_iso_date,
+    type=valid_date,
     default=date.today(),
     help="date to update counters to (defaults to today)",
 )
@@ -58,7 +73,7 @@ parser.add_argument(
 parser.add_argument(
     "-n", "--dry-run",
     nargs="?",
-    type=valid_iso_date,
+    type=valid_date,
     const=date.today(),
     help="display the values that would be used if counters program were run",
 )
