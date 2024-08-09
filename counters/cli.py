@@ -28,6 +28,8 @@ def valid_date(value: str) -> date:
     if value in {"tomorrow", "tmrw", "tmr"}:
         tomorrow = date.today() + timedelta(days=1)
         return tomorrow
+    if value in {"today"}:
+        return date.today()
 
     # Then try ISO 8601.
     try:
