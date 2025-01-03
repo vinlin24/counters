@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Bios",
+  "description": "Templates to use for the counters program",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "discord": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "required": [
+        "status",
+        "start"
+      ]
+    },
+    "instagram": {
+      "type": "object",
+      "properties": {
+        "bio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "required": [
+        "bio",
+        "start"
+      ]
+    },
+    "spotify": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": [
+              "number",
+              "string",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "playlist_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "required": [
+          "playlist_id",
+          "name",
+          "description",
+          "start"
+        ]
+      }
+    },
+    "github": {
+      "type": "object",
+      "properties": {
+        "bio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "required": [
+        "bio",
+        "start"
+      ]
+    }
+  },
+  "required": [
+    "discord",
+    "instagram",
+    "spotify",
+    "github"
+  ]
+}
